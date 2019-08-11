@@ -65,7 +65,7 @@ public class LocationService extends Service implements LocationListener {
         if (location != null){
             this.location = location;
             double currentSpeed = (location.getSpeed()*3600)/1000;
-            if (currentSpeed >(15*3600)/1000){
+            if (currentSpeed >15){
                 //trigger the action => NotDisturb-Modus on (pending Intent with:
                 initSafeOnRoad();
             }
