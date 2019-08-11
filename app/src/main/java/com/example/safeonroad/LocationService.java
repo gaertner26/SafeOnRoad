@@ -62,23 +62,20 @@ public class LocationService extends Service implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        if (location != null){
+        if (location != null) {
             this.location = location;
             double speed = location.getSpeed();
-           /**double currentSpeed = (location.getSpeed()*3600)/1000;
-            if (currentSpeed >15){
+            double currentSpeed = (location.getSpeed() * 3600) / 1000;
+            if (currentSpeed > 15) {
                 //trigger the action => NotDisturb-Modus on (pending Intent with:
                 initSafeOnRoad();
-            }**/
-           Intent i = new Intent(this, MainActivity.class);
-           i.putExtra("speed",speed);
-           startService(i);
-        }
+            }
 
+        }
     }
 
     private void initSafeOnRoad() {
-        //
+
     }
 
     @Override

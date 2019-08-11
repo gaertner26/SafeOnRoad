@@ -50,14 +50,8 @@ public class MainActivity extends AppCompatActivity{
             //hier the App should calculate in background the speed and then, according to the data, set the textView, but it obviously does not work so easy;((
                                      @Override
                                      public void onClick(View view) {
-                                         Bundle b = getIntent().getExtras();
-                                         Double speed = b.getDouble("speed");
-                                         if (speed>1){
-                                             textView.setText("Your speed is more than 1 m/s, exactly" + speed.toString());
-                                         }else {
-                                             textView.setText ("Your speed is smaller than 1 m/s");
-                                         }
-
+                                         Intent i = new Intent(MainActivity.this, LocationService.class);
+                                         startService(i);
                                      }
                                  });
 
