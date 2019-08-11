@@ -28,7 +28,7 @@ public class LocationService extends Service implements LocationListener {
 
     public void onCreate(){
     }
-
+ //This Method activates the LocationManager, checks permissions and updates location; can be modified, but the main idea is correct
     public void getLocation(){
         try {
             locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
@@ -37,12 +37,12 @@ public class LocationService extends Service implements LocationListener {
             if (GPSisEnabled) {
                 //checking Permissions on a run time
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    //request missing permissions - for details: ActivityCompat requestPermissions
+                   //I don't know what to do, because the permisssions can only be requested from the Activity, not the Service
                 }
 
                 //permissions are checked => now request Location Updates:
                locationManager.requestLocationUpdates(provider, MIN_TIME_BETWEEN_UPDATES, MIN_DISTANCE_CHECK_FOR_UPDATES, this);
-                //location = locationManager.getLastKnownLocation(provider);
+                //location = locationManager.getLastKnownLocation(provider); and the method not void, but Location and return updated Location
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -64,12 +64,15 @@ public class LocationService extends Service implements LocationListener {
     public void onLocationChanged(Location location) {
         if (location != null){
             this.location = location;
-            double currentSpeed = (location.getSpeed()*3600)/1000;
+            double speed = location.getSpeed();
+           /**double currentSpeed = (location.getSpeed()*3600)/1000;
             if (currentSpeed >15){
                 //trigger the action => NotDisturb-Modus on (pending Intent with:
                 initSafeOnRoad();
-            }
-
+            }**/
+           Intent i = new Intent(this, MainActivity.class);
+           i.putExtra("speed",speed);
+           startService(i);
         }
 
     }
@@ -90,6 +93,6 @@ public class LocationService extends Service implements LocationListener {
 
     @Override
     public void onProviderDisabled(String s) {
- //write a new intent??? which will send a user to the setting panel, where the user can enable GPS
+ //write a new intent??? which will send a user to the setting panel, where a user can enable GPS
     }
 }
