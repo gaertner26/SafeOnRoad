@@ -11,6 +11,7 @@ public class MainService extends Service {
     public boolean isServiceActive = TRUE;
 
 
+    // Christoph, 2019-8-12
     private int idBluethoothCar;
     public MainService() {
         //if this service is active, he should perform every 250 ms the following action:

@@ -37,6 +37,9 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initViews();
+
+
+        //init Service and onDestroy added by Christoph
         initService();
 
     }
