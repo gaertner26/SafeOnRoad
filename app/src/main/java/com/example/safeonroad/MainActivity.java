@@ -33,6 +33,8 @@ public class MainActivity extends AppCompatActivity{
     private final int PERMISSION_ALREADY_REVOKED = -1;
 
 
+    //Times for Cooldowns etc
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
