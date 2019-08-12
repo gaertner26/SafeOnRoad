@@ -36,6 +36,38 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initViews();
+        initService();
+
+    }
+
+    private void initService(){
+
+        //if Main Button Was pressed: Start MainBackgroundService in ANOTHER THREAD!
+        service.setIdBluethoothCar(int carID);
+        service.setActiveState(true);
+        service.start();
+
+
+        // if big Button was pressed:
+        service.setActiveState(false);   // AND service gets closed when this activity gets closed -> if case later
+        // or
+        stop(service)  //?
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        if(service.isActive == false){
+            stopService()
+        }
+
+
+        //otherwise, the service should run even if the app is closed
+        // if the service is closed here, he can only be activated again by restarting the app and pressing the button
+    }
+
+    private void initViews(){
         setContentView(R.layout.activity_main);
         start = findViewById(R.id.start);
         textView = findViewById(R.id.textView);
@@ -48,13 +80,12 @@ public class MainActivity extends AppCompatActivity{
         });
         start.setOnClickListener(new View.OnClickListener() {
             //hier the App should calculate in background the speed and then, according to the data, set the textView, but it obviously does not work so easy;((
-                                     @Override
-                                     public void onClick(View view) {
-                                         Intent i = new Intent(MainActivity.this, LocationService.class);
-                                         startService(i);
-                                     }
-                                 });
-
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivity.this, LocationService.class);
+                startService(i);
+            }
+        });
     }
 
     private void requestPermissions() {
