@@ -5,6 +5,7 @@ package com.example.safeonroad;
 // The part with Intent is also a test, and doesn't work and can be deleted
 
 
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -17,16 +18,22 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
 
 public class MainActivity extends AppCompatActivity{
     //UI to test the service with speedometer
     private Button start;
     private Button permissions;
     private TextView textView;
+    private DrawerLayout drawLayout;
 
 
     private final int PERMISSIONS_LOCATION = 3;
@@ -40,13 +47,34 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
         doNotDisturbOn();
-        //initViews();
+        initViews();
+        initActionBar();
 
 
         //init Service and onDestroy added by Christoph
         //initService();
 
+    }
+ //written by Victoria 12.08.2019, 22:34
+    private void initActionBar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        drawLayout = findViewById(R.id.drawer_Layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawLayout,toolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_closed);
+        drawLayout.addDrawerListener(toggle);
+        toggle.syncState();
+    }
+
+    @Override
+    public void onBackPressed() {
+        //close Navigation and do not leave the activity!
+        if(drawLayout.isDrawerOpen(GravityCompat.START)){
+            drawLayout.closeDrawer(GravityCompat.START);
+        }else {
+        super.onBackPressed();
+        }
     }
 
     private void initService(){
@@ -95,7 +123,9 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void initViews(){
-        setContentView(R.layout.activity_main);
+
+
+
         start = findViewById(R.id.start);
         textView = findViewById(R.id.textView);
         permissions = findViewById(R.id.permissions);
