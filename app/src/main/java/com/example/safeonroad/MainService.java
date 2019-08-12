@@ -1,9 +1,18 @@
 package com.example.safeonroad;
 
+import android.Manifest;
 import android.app.Service;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.IBinder;
 import android.os.SystemClock;
+import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
 
 import java.util.Calendar;
 
@@ -13,6 +22,8 @@ import static java.lang.Boolean.TRUE;
 
 // Christoph, 2019-8-12
 public class MainService extends Service {
+    private Location location;
+    private BluetoothAdapter bluetoothAdapter;
     public boolean isServiceActive = TRUE;
 
     private long manualCoolddownStartTime = 0;   //timestamp when user told the app to go to standby for 1 hr
@@ -26,6 +37,10 @@ public class MainService extends Service {
 
 
     public MainService() {
+        //initialize Location
+        initLocation();
+        //initialize Bluetooth
+        initBluetooth();
         //if this service is active, he should perform every 250 ms the following action:
         while(isServiceActive){
             //sleep(250);
@@ -34,7 +49,7 @@ public class MainService extends Service {
             }else{
                 long time = System.currentTimeMillis();
                 if(System.currentTimeMillis() - manualCoolddownStartTime >= manualCooldownDuration){  //check, if app has been paused for 2 hours
-                    int velocity = getVelocity(); //thread 2? idk
+                    float velocity = location.getSpeed(); //changed by Sandra 2019-08-12 14:55
                     if(velocity >= 20 && getDontDisturb() == false){
                         dontDisturb(TRUE);
                         autoCooldownStartTime = 0;
@@ -45,16 +60,41 @@ public class MainService extends Service {
                             dontDisturb(FALSE);
                         }
                     }
+
                 }
             }
 
 
         }
 
-
-
+    }
+    //By Sandra 2019-08-12 14:55
+    private void initLocation() {
+        try {
+            String service = Context.LOCATION_SERVICE;
+            LocationManager locationManager = (LocationManager) getSystemService(service);
+            String provider = LocationManager.GPS_PROVIDER;
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                location = locationManager.getLastKnownLocation(provider);
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            Toast toast = Toast.makeText(this, "You have to accept the Permissions", Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 
+    private void initBluetooth() {
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if(bluetoothAdapter == null){
+
+        }
+    }
+    //Sandra 12.08.2019 (onStartCommand)
+    @Override
+    public int onStartCommand (Intent intent, int flags, int startId){
+        return Service.START_NOT_STICKY;
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -70,9 +110,12 @@ public class MainService extends Service {
         }
 
     }
-
+    //Bluetooth Permissions are in the Manifest now by Sandra 2019-08-12 15:01
     private boolean isBluetoothActive(){
-        //checks, if Bluetooth is active at the moment
+        //if-Abfrage by Sandra 2019-08-12 15:16
+        if(bluetoothAdapter ==null || !bluetoothAdapter.isEnabled()) {
+            return FALSE;
+        }
         return TRUE;
     }
 

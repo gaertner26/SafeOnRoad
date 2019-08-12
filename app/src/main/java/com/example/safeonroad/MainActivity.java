@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity{
             //hier the App should calculate in background the speed and then, according to the data, set the textView, but it obviously does not work so easy;((
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this, LocationService.class);
+                Intent i = new Intent(MainActivity.this, MainService.class); //Changed to MainService by Sandra 2019-08-12 14:57
                 startService(i);
             }
         });

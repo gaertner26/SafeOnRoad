@@ -51,6 +51,7 @@ public class LocationService extends Service implements LocationListener {
 
 
 
+
     @Override
     public int onStartCommand (Intent intent, int flags, int startId){
         return Service.START_NOT_STICKY;
@@ -65,7 +66,7 @@ public class LocationService extends Service implements LocationListener {
         if (location != null) {
             this.location = location;
             double speed = location.getSpeed();
-            double currentSpeed = (location.getSpeed() * 3600) / 1000;
+            double currentSpeed = (speed * 3600) / 1000; //location.getSpeed() = speed, so variable speed is used
             if (currentSpeed > 15) {
                 //trigger the action => NotDisturb-Modus on (pending Intent with:
                 initSafeOnRoad();
