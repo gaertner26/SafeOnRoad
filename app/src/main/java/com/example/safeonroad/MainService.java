@@ -50,7 +50,7 @@ public class MainService extends Service {
                 long time = System.currentTimeMillis();
                 if(System.currentTimeMillis() - manualCoolddownStartTime >= manualCooldownDuration){  //check, if app has been paused for 2 hours
                     float velocity = location.getSpeed(); //changed by Sandra 2019-08-12 14:55
-                    if(velocity >= 20 && getDontDisturb() == false){
+                    if(velocity >= 20){ //&& getDontDisturb() == false){
                         dontDisturb(TRUE);
                         autoCooldownStartTime = 0;
                     }else if(velocity < 20){
@@ -103,11 +103,13 @@ public class MainService extends Service {
     }
 
     private void dontDisturb(boolean state){
+        /*
         if(getDontDisturb() == false && state == true){
             setDontDisturb = true;
         }else if(getDontDisturb() == true && state == false){
             setDontDisturb = false;
         }
+        */
 
     }
     //Bluetooth Permissions are in the Manifest now by Sandra 2019-08-12 15:01
