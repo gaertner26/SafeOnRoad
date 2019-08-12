@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity{
 
     private void requestPermissions() {
 
-            String[] PERMISSIONS = {Manifest.permission.INTERNET,Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION};
+            String[] PERMISSIONS = {Manifest.permission.INTERNET,Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION,  Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN};
             int permission = hasPermissions(this, PERMISSIONS);
             if(permission == PERMISSION_NOT_GRANTED){
                 ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSIONS_LOCATION);

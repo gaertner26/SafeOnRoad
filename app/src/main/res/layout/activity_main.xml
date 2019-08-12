@@ -28,4 +28,6 @@
         android:layout_alignTop="@+id/textView"
         android:layout_marginTop="187dp"
         android:text="GET PERMISSIONS" />
+
+
 </RelativeLayout>
