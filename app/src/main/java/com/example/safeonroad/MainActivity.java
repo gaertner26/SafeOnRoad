@@ -16,10 +16,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -30,20 +33,25 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity implements LocationListener {
     //UI to test the service with speedometer
     private Button start;
     private Button permissions;
     private TextView textView;
     private DrawerLayout drawLayout;
 
-    private Location newLocation;
-
-
     private final int PERMISSIONS_LOCATION = 3;
     private final int PERMISSION_NOT_GRANTED = 0;
     private final int PERMISSION_ALREADY_GRANTED = 1;
     private final int PERMISSION_ALREADY_REVOKED = -1;
+
+    private static final long MIN_DISTANCE_CHECK_FOR_UPDATES = 1; //10 meters Location will update every 10 meters. Only after the user have moved the location will be updated
+    private static final long MIN_TIME_BETWEEN_UPDATES = 1000;
+    private LocationManager locationManager;
+    private String provider;
+    private Location location;
+    private Boolean GPSisEnabled;
+    private Location startLocation;
 
 
     //Times for Cooldowns etc
@@ -54,62 +62,27 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
         initViews();
         initActionBar();
+        // init location + textView by Sandra 2019-08-14 12:56
         initLocation();
-
-
+        if(location != null) {
+            textView.setText(Integer.toString((int) location.getLongitude()));
+        }else{
+            textView.setText("Your device has no GPS");
+        }
         //init Service and onDestroy added by Christoph
         //initService();
-
-
-
-
 
     }
 
     //By Sandra 2019-08-12 14:55
-    private void initLocation() {
-        try {
-            String service = Context.LOCATION_SERVICE;
-            LocationManager locationManager = (LocationManager) getSystemService(service);
-            String provider = LocationManager.GPS_PROVIDER;
-            Boolean GPSisEnabled = locationManager.isProviderEnabled(provider);
-            if(GPSisEnabled) {
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    newLocation = locationManager.getLastKnownLocation(provider);
-                }
-            }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast toast = Toast.makeText(this, "You have to accept the Permissions", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-
-        //float speed= newLocation.getSpeed();
-        try
-        {
-            float speed = newLocation.getSpeed();
-
-        }catch (Exception e){
-            //ERROR
-        }
-        /*
-        //float speed = newLocation.distanceTo(lastLocation);
-        lastLocation = newLocation;
-        int i = (int)speed;
-        textView = findViewById(R.id.textView);
-        textView.setText(String.valueOf(i));
-        */
-
-
-    }
- //written by Victoria 12.08.2019, 22:34
+    //written by Victoria 12.08.2019, 22:34
 
     private void initActionBar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         drawLayout = findViewById(R.id.drawer_Layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawLayout,toolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_closed);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_closed);
         drawLayout.addDrawerListener(toggle);
         toggle.syncState();
     }
@@ -117,14 +90,14 @@ public class MainActivity extends AppCompatActivity{
     @Override
     public void onBackPressed() {
         //close Navigation and do not leave the activity!
-        if(drawLayout.isDrawerOpen(GravityCompat.START)){
+        if (drawLayout.isDrawerOpen(GravityCompat.START)) {
             drawLayout.closeDrawer(GravityCompat.START);
-        }else {
-        super.onBackPressed();
+        } else {
+            super.onBackPressed();
         }
     }
 
-    private void initService(){
+    private void initService() {
         Intent i = new Intent(this, MainService.class);
         startService(i);
         /*
@@ -142,9 +115,8 @@ public class MainActivity extends AppCompatActivity{
     }
 
 
-
     @Override
-    protected void onDestroy(){
+    protected void onDestroy() {
         super.onDestroy();
         /*
         if(service.isActive == false){
@@ -157,8 +129,7 @@ public class MainActivity extends AppCompatActivity{
         // if the service is closed here, he can only be activated again by restarting the app and pressing the button
     }
 
-    private void initViews(){
-
+    private void initViews() {
 
 
         start = findViewById(R.id.start);
@@ -182,24 +153,25 @@ public class MainActivity extends AppCompatActivity{
 
     private void requestPermissions() {
 
-            String[] PERMISSIONS = {Manifest.permission.INTERNET,Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION,  Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN};
-            int permission = hasPermissions(this, PERMISSIONS);
-            if(permission == PERMISSION_NOT_GRANTED){
-                ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSIONS_LOCATION);
-            }else if(permission == PERMISSION_ALREADY_REVOKED) {
-                showDialog(PERMISSIONS, PERMISSIONS_LOCATION);
-            }else {
-                Toast.makeText(this, R.string.prev_all_permissions, Toast.LENGTH_SHORT).show();
-            }
+        String[] PERMISSIONS = {Manifest.permission.INTERNET, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN};
+        int permission = hasPermissions(this, PERMISSIONS);
+        if (permission == PERMISSION_NOT_GRANTED) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSIONS_LOCATION);
+        } else if (permission == PERMISSION_ALREADY_REVOKED) {
+            showDialog(PERMISSIONS, PERMISSIONS_LOCATION);
+        } else {
+            Toast.makeText(this, R.string.prev_all_permissions, Toast.LENGTH_SHORT).show();
         }
+    }
+
     private int hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
             for (String permission : permissions) {
 //                    This line checks if the permission already has been revoked one time
                 if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) context,permission)){
+                    if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) context, permission)) {
                         return PERMISSION_ALREADY_REVOKED;
-                    }else {
+                    } else {
                         return PERMISSION_NOT_GRANTED;
                     }
                 }
@@ -207,7 +179,8 @@ public class MainActivity extends AppCompatActivity{
         }
         return PERMISSION_ALREADY_GRANTED;
     }
-    private void showDialog(final String [] PERMISSIONS, final int permissionCode){
+
+    private void showDialog(final String[] PERMISSIONS, final int permissionCode) {
         android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(
                 this);
         dialog.setTitle(R.string.dialog_title);
@@ -221,4 +194,50 @@ public class MainActivity extends AppCompatActivity{
         dialog.show();
     }
 
-}
+    private void showSpeed() {
+        initLocation();
+    }
+
+    private void initLocation() {
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        provider = LocationManager.GPS_PROVIDER;
+        GPSisEnabled = locationManager.isProviderEnabled(provider);
+        if(GPSisEnabled) {
+            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            locationManager.requestLocationUpdates(provider, MIN_TIME_BETWEEN_UPDATES, MIN_DISTANCE_CHECK_FOR_UPDATES, this);
+            location = locationManager.getLastKnownLocation(provider);
+
+        }
+    }
+    @Override
+    public void onLocationChanged (Location location){
+        this.location = location;
+        if(location != null) {
+            textView.setText("You moved");
+        }else{
+            textView.setText("Your location isn´t available");
+        }
+    }
+
+    @Override
+    public void onStatusChanged (String s,int i, Bundle bundle){
+
+    }
+
+    @Override
+    public void onProviderEnabled (String provider){
+
+    }
+
+    @Override
+    public void onProviderDisabled (String provider){
+
+    }
+
+
+    }
+
+
+
