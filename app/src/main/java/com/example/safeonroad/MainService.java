@@ -23,6 +23,7 @@ import static java.lang.Boolean.TRUE;
 // Christoph, 2019-8-12
 public class MainService extends Service {
     private Location lastLocation;
+    private Location newLocation;
     private BluetoothAdapter bluetoothAdapter;
     public boolean isServiceActive = TRUE;
 
@@ -86,7 +87,7 @@ public class MainService extends Service {
     }
 
     private float getSpeed() {
-        Location newLocation = initLocation();
+        initLocation();
         float distance = newLocation.distanceTo(lastLocation);
 
         float speed = distance / 1;   //jede sekunde location abfragen?
@@ -97,14 +98,13 @@ public class MainService extends Service {
     }
 
     //By Sandra 2019-08-12 14:55
-    private Location initLocation() {
+    private void initLocation() {
         try {
             String service = Context.LOCATION_SERVICE;
             LocationManager locationManager = (LocationManager) getSystemService(service);
             String provider = LocationManager.GPS_PROVIDER;
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                Location location = locationManager.getLastKnownLocation(provider);
-                return location;
+                newLocation = locationManager.getLastKnownLocation(provider);
             }
         } catch (Exception e) {
             e.printStackTrace();
