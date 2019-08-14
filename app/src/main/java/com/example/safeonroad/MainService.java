@@ -22,7 +22,7 @@ import static java.lang.Boolean.TRUE;
 
 // Christoph, 2019-8-12
 public class MainService extends Service {
-    private Location location;
+    private Location lastLocation;
     private BluetoothAdapter bluetoothAdapter;
     public boolean isServiceActive = TRUE;
 
@@ -42,7 +42,22 @@ public class MainService extends Service {
         //initialize Bluetooth
         initBluetooth();
         //if this service is active, he should perform every 250 ms the following action:
-        while(isServiceActive){
+
+
+        while (isServiceActive) {
+
+
+            float velocity = getSpeed(); //changed by Sandra 2019-08-12 14:55
+            if (velocity >= 20) {
+                dontDisturb(TRUE);
+            } else if (velocity < 20) {
+                dontDisturb(FALSE);
+            }
+
+
+
+
+            /*
             //sleep(250);
             if(isBluetoothActive() && isBluetoothCarActive()){
                 dontDisturb(TRUE);
@@ -63,26 +78,61 @@ public class MainService extends Service {
 
                 }
             }
+            */
 
 
         }
 
     }
+
+    private float getSpeed() {
+        Location newLocation = initLocation();
+        float distance = newLocation.distanceTo(lastLocation);
+
+        float speed = distance / 1;   //jede sekunde location abfragen?
+        lastLocation = newLocation;
+        return speed;
+
+
+    }
+
     //By Sandra 2019-08-12 14:55
-    private void initLocation() {
+    private Location initLocation() {
         try {
             String service = Context.LOCATION_SERVICE;
             LocationManager locationManager = (LocationManager) getSystemService(service);
             String provider = LocationManager.GPS_PROVIDER;
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                location = locationManager.getLastKnownLocation(provider);
+                Location location = locationManager.getLastKnownLocation(provider);
+                return location;
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             Toast toast = Toast.makeText(this, "You have to accept the Permissions", Toast.LENGTH_SHORT);
             toast.show();
         }
     }
+
+
+
+
+
+
+
+
+    private void dontDisturb(boolean state){
+        /*
+        if(getDontDisturb() == false && state == true){
+            setDontDisturb = true;
+        }else if(getDontDisturb() == true && state == false){
+            setDontDisturb = false;
+        }
+        */
+
+    }
+
+
+
 
     private void initBluetooth() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -102,16 +152,7 @@ public class MainService extends Service {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    private void dontDisturb(boolean state){
-        /*
-        if(getDontDisturb() == false && state == true){
-            setDontDisturb = true;
-        }else if(getDontDisturb() == true && state == false){
-            setDontDisturb = false;
-        }
-        */
 
-    }
     //Bluetooth Permissions are in the Manifest now by Sandra 2019-08-12 15:01
     private boolean isBluetoothActive(){
         //if-Abfrage by Sandra 2019-08-12 15:16
