@@ -10,6 +10,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.IBinder;
 import android.os.SystemClock;
+import android.telephony.VisualVoicemailSmsFilterSettings;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
@@ -38,8 +39,6 @@ public class MainService extends Service {
 
 
     public MainService() {
-        //initialize Location
-        initLocation();
         //initialize Bluetooth
         initBluetooth();
         //if this service is active, he should perform every 250 ms the following action:
@@ -135,10 +134,9 @@ public class MainService extends Service {
 
 
     private void initBluetooth() {
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if(bluetoothAdapter == null){
-
-        }
+            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
+                bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            }
     }
     //Sandra 12.08.2019 (onStartCommand)
     @Override
@@ -156,7 +154,7 @@ public class MainService extends Service {
     //Bluetooth Permissions are in the Manifest now by Sandra 2019-08-12 15:01
     private boolean isBluetoothActive(){
         //if-Abfrage by Sandra 2019-08-12 15:16
-        if(bluetoothAdapter ==null || !bluetoothAdapter.isEnabled()) {
+        if(bluetoothAdapter == null || !bluetoothAdapter.isEnabled() ) {
             return FALSE;
         }
         return TRUE;

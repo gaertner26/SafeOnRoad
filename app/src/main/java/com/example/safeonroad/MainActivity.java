@@ -16,6 +16,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -34,6 +36,8 @@ public class MainActivity extends AppCompatActivity{
     private Button permissions;
     private TextView textView;
     private DrawerLayout drawLayout;
+    private Location lastLocation;
+    private Location newLocation;
 
 
     private final int PERMISSIONS_LOCATION = 3;
@@ -51,11 +55,36 @@ public class MainActivity extends AppCompatActivity{
         doNotDisturbOn();
         initViews();
         initActionBar();
+        initLocation();
 
 
         //init Service and onDestroy added by Christoph
         //initService();
 
+
+
+
+
+    }
+
+    //By Sandra 2019-08-12 14:55
+    private void initLocation() {
+        try {
+            String service = Context.LOCATION_SERVICE;
+            LocationManager locationManager = (LocationManager) getSystemService(service);
+            String provider = LocationManager.GPS_PROVIDER;
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                newLocation = locationManager.getLastKnownLocation(provider);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast toast = Toast.makeText(this, "You have to accept the Permissions", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+        float speed= newLocation.getSpeed();
+        int i = (int)speed;
+        textView = findViewById(R.id.textView);
+        textView.setText(i);
     }
  //written by Victoria 12.08.2019, 22:34
     private void initActionBar() {
