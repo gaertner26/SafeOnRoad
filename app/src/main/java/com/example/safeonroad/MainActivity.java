@@ -33,7 +33,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 
-public class MainActivity extends AppCompatActivity implements LocationListener {
+public class MainActivity extends AppCompatActivity /*implements LocationListener */{
     //UI to test the service with speedometer
     private Button start;
     private Button permissions;
@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private String provider;
     private Location location;
     private Boolean GPSisEnabled;
-    private Location startLocation;
 
 
     //Times for Cooldowns etc
@@ -64,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         initViews();
         initActionBar();
         // init location + textView by Sandra 2019-08-14 12:56
-        initLocation();
+        /*initLocation();
         if(location != null) {
             textView.setText(Integer.toString((int) location.getLongitude()));
         }else{
@@ -72,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
         //init Service and onDestroy added by Christoph
         //initService();
-
+        */
     }
 
     //By Sandra 2019-08-12 14:55
@@ -195,11 +194,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         dialog.show();
     }
 
-    private void showSpeed() {
-        initLocation();
-    }
-
-    private void initLocation() {
+    /*private void initLocation() {
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         provider = LocationManager.GPS_PROVIDER;
         GPSisEnabled = locationManager.isProviderEnabled(provider);
@@ -239,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void onProviderDisabled (String provider){
 
     }
-
+    */
 
     }
 
