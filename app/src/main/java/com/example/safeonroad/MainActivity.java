@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity{
     private Button permissions;
     private TextView textView;
     private DrawerLayout drawLayout;
-    private Location lastLocation;
+
     private Location newLocation;
 
 
@@ -72,9 +72,13 @@ public class MainActivity extends AppCompatActivity{
             String service = Context.LOCATION_SERVICE;
             LocationManager locationManager = (LocationManager) getSystemService(service);
             String provider = LocationManager.GPS_PROVIDER;
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                newLocation = locationManager.getLastKnownLocation(provider);
+            Boolean GPSisEnabled = locationManager.isProviderEnabled(provider);
+            if(GPSisEnabled) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    newLocation = locationManager.getLastKnownLocation(provider);
+                }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             Toast toast = Toast.makeText(this, "You have to accept the Permissions", Toast.LENGTH_SHORT);
