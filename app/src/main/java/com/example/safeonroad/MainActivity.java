@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        doNotDisturbOn();
         initViews();
         initActionBar();
         initLocation();
@@ -81,12 +80,27 @@ public class MainActivity extends AppCompatActivity{
             Toast toast = Toast.makeText(this, "You have to accept the Permissions", Toast.LENGTH_SHORT);
             toast.show();
         }
-        float speed= newLocation.getSpeed();
+
+        //float speed= newLocation.getSpeed();
+        try
+        {
+            float speed = newLocation.getSpeed();
+
+        }catch (Exception e){
+            //ERROR
+        }
+        /*
+        //float speed = newLocation.distanceTo(lastLocation);
+        lastLocation = newLocation;
         int i = (int)speed;
         textView = findViewById(R.id.textView);
-        textView.setText(i);
+        textView.setText(String.valueOf(i));
+        */
+
+
     }
  //written by Victoria 12.08.2019, 22:34
+
     private void initActionBar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -107,7 +121,8 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void initService(){
-
+        Intent i = new Intent(this, MainService.class);
+        startService(i);
         /*
         //if Main Button Was pressed: Start MainBackgroundService in ANOTHER THREAD!
         service.setIdBluethoothCar(int carID);
@@ -122,20 +137,7 @@ public class MainActivity extends AppCompatActivity{
         */
     }
 
-    // Christoph 12.9   18:30
-    public void doNotDisturbOn(){
-        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-        // Check if the notification policy access has been granted for the app.
-        if ((Build.VERSION.SDK_INT >= 23 && !notificationManager.isNotificationPolicyAccessGranted())) {     //ask for persmission
-            Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
-            startActivity(intent);
-        }
 
-        if (Build.VERSION.SDK_INT >= 23 && notificationManager.isNotificationPolicyAccessGranted()) {
-            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE);      //no Interruption = Everything Blocked
-        }
-
-    }
 
     @Override
     protected void onDestroy(){

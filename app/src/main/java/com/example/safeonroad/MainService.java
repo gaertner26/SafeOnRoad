@@ -1,6 +1,7 @@
 package com.example.safeonroad;
 
 import android.Manifest;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.telephony.VisualVoicemailSmsFilterSettings;
@@ -23,8 +25,10 @@ import static java.lang.Boolean.TRUE;
 
 // Christoph, 2019-8-12
 public class MainService extends Service {
+
     private Location lastLocation;
     private Location newLocation;
+
     private BluetoothAdapter bluetoothAdapter;
     public boolean isServiceActive = TRUE;
 
@@ -92,8 +96,6 @@ public class MainService extends Service {
         float speed = distance / 1;   //jede sekunde location abfragen?
         lastLocation = newLocation;
         return speed;
-
-
     }
 
     //By Sandra 2019-08-12 14:55
@@ -130,6 +132,19 @@ public class MainService extends Service {
 
     }
 
+    public void doNotDisturbOn(){
+        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        // Check if the notification policy access has been granted for the app.
+        if ((Build.VERSION.SDK_INT >= 23 && !notificationManager.isNotificationPolicyAccessGranted())) {     //ask for persmission
+            Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+            startActivity(intent);
+        }
+
+        if (Build.VERSION.SDK_INT >= 23 && notificationManager.isNotificationPolicyAccessGranted()) {
+            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE);      //no Interruption = Everything Blocked
+        }
+
+    }
 
 
 
