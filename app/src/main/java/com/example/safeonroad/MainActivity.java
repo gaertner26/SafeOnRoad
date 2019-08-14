@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private final int PERMISSION_NOT_GRANTED = 0;
     private final int PERMISSION_ALREADY_GRANTED = 1;
     private final int PERMISSION_ALREADY_REVOKED = -1;
+    private final int MIN_SPEED = 20;
 
     private static final long MIN_DISTANCE_CHECK_FOR_UPDATES = 1; //10 meters Location will update every 10 meters. Only after the user have moved the location will be updated
     private static final long MIN_TIME_BETWEEN_UPDATES = 1000;
@@ -218,6 +219,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             textView.setText("You moved");
         }else{
             textView.setText("Your location isn´t available");
+        }
+        if(location.getSpeed()* 3.6 >= MIN_SPEED){
+            textView.setText("zu schnell");
         }
     }
 
