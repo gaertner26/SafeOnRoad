@@ -2,6 +2,7 @@ package com.example.safeonroad;
 
 import android.Manifest;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
@@ -44,23 +45,19 @@ public class MainService extends Service implements LocationListener {
 
     private int idBluethoothCar;
     */
-    private final int MIN_SPEED = 20;
+    private final int MIN_SPEED = 1;
 
-    private static final long MIN_DISTANCE_CHECK_FOR_UPDATES = 1; //10 meters Location will update every 10 meters. Only after the user have moved the location will be updated
+    private static final long MIN_DISTANCE_CHECK_FOR_UPDATES = 0; //10 meters Location will update every 10 meters. Only after the user have moved the location will be updated
     private static final long MIN_TIME_BETWEEN_UPDATES = 1000;
     private LocationManager locationManager;
     private String provider;
     private Location location;
     private Boolean GPSisEnabled;
 
+    float autoCooldownStartTime = 0;
+    float AUTOCOOLDOWNTIME = 5000; // Time, the user has to be slower than 1 m/s, before the Do Not Disturb Mode deactivates itself (Ampelpausen etc)
+
     public MainService() {
-        //initialize Bluetooth
-        //initBluetooth();
-        //initializeLocation
-
-        //if this service is active, he should perform every 250 ms the following action:
-
-
         /*while (isServiceActive) {
 
 
@@ -103,15 +100,6 @@ public class MainService extends Service implements LocationListener {
     public void onCreate(){
         initLocation();
         initBluetooth();
-    }
-    private void dontDisturb(boolean state){
-        /*
-        if(getDontDisturb() == false && state == true){
-            setDontDisturb = true;
-        }else if(getDontDisturb() == true && state == false){
-            setDontDisturb = false;
-        }
-        */
 
     }
 
@@ -130,7 +118,16 @@ public class MainService extends Service implements LocationListener {
     }
 
     public void doNotDisturbOff () {
-        //do-not-disturb-modus has to be turned off, if person is slower than 20 km/h for some time.
+        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        // Check if the notification policy access has been granted for the app.
+        if ((Build.VERSION.SDK_INT >= 23 && !notificationManager.isNotificationPolicyAccessGranted())) {     //ask for persmission
+            Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+            startActivity(intent);
+        }
+
+        if (Build.VERSION.SDK_INT >= 23 && notificationManager.isNotificationPolicyAccessGranted()) {
+            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);      //no Interruption = Everything Blocked
+        }
     }
 
 
@@ -152,7 +149,7 @@ public class MainService extends Service implements LocationListener {
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
     }
-    //by Sandra 2019-08-14
+    // TODO Hinweis darauf, dass GPS nicht an ist
     private void initLocation() {
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         provider = LocationManager.GPS_PROVIDER;
@@ -163,7 +160,8 @@ public class MainService extends Service implements LocationListener {
             }
             locationManager.requestLocationUpdates(provider, MIN_TIME_BETWEEN_UPDATES, MIN_DISTANCE_CHECK_FOR_UPDATES, this);
             location = locationManager.getLastKnownLocation(provider);
-
+            Log.d("SPEED","Created Location Updater");
+            MainActivity.setText("Created Location Updater");
         }
     }
 
@@ -171,9 +169,25 @@ public class MainService extends Service implements LocationListener {
     public void onLocationChanged (Location location){
         //do not disturb modus is activate, if speed is higher than 20 kilometers per hour
         this.location = location;
+        Log.d("SPEED"," Current Speed: " + String.valueOf(location.getSpeed()));
+        MainActivity.setText(" Current Speed: " + String.valueOf(location.getSpeed()));
+
         if(location.getSpeed()*3.6 >= MIN_SPEED){
             doNotDisturbOn();
+            autoCooldownStartTime = 0;
         }
+
+
+        if(location.getSpeed()*3.6 < MIN_SPEED){
+            if(autoCooldownStartTime == 0){
+                autoCooldownStartTime = System.currentTimeMillis();
+            }else if(System.currentTimeMillis() - autoCooldownStartTime > AUTOCOOLDOWNTIME){
+                doNotDisturbOff();
+                autoCooldownStartTime = 0;
+            }
+
+        }
+
     }
 
     @Override

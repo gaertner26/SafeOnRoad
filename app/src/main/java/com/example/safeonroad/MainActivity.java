@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity /*implements LocationListene
     //UI to test the service with speedometer
     private Button start;
     private Button permissions;
-    private TextView textView;
+    private static TextView textView;
     private DrawerLayout drawLayout;
     private Button button3;
     private TextView bluetoothCar;
@@ -124,6 +124,10 @@ public class MainActivity extends AppCompatActivity /*implements LocationListene
         */
     }
 
+    public static void setText(String newText){
+        textView.setText(newText);
+    }
+
 
     @Override
     protected void onDestroy() {
@@ -157,6 +161,7 @@ public class MainActivity extends AppCompatActivity /*implements LocationListene
             public void onClick(View view) {
                 Intent i = new Intent(MainActivity.this, MainService.class); //Changed to MainService by Sandra 2019-08-12 14:57
                 startService(i);
+                textView.setText("Service Started!");
             }
         });
         button3 = findViewById(R.id.button3);
