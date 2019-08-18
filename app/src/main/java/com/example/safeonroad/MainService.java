@@ -29,13 +29,13 @@ import static java.lang.Boolean.TRUE;
 // Christoph, 2019-8-12
 public class MainService extends Service implements LocationListener {
 
-    /*private Location lastLocation;
-    private Location newLocation;
+    //private Location lastLocation;
+    //private Location newLocation;
 
     private BluetoothAdapter bluetoothAdapter;
     public boolean isServiceActive = TRUE;
 
-    private long manualCoolddownStartTime = 0;   //timestamp when user told the app to go to standby for 1 hr
+    /*private long manualCoolddownStartTime = 0;   //timestamp when user told the app to go to standby for 1 hr
     private long autoCooldownStartTime = 0; // timestamp when the car started to drive < 20 hm/h
 
     private int manualCooldownDuration = 60 * 60 * 1000;   //example: 1 hr
@@ -102,6 +102,7 @@ public class MainService extends Service implements LocationListener {
     @Override
     public void onCreate(){
         initLocation();
+        initBluetooth();
     }
     private void dontDisturb(boolean state){
         /*
@@ -128,14 +129,18 @@ public class MainService extends Service implements LocationListener {
 
     }
 
+    public void doNotDisturbOff () {
+        //do-not-disturb-modus has to be turned off, if person is slower than 20 km/h for some time.
+    }
 
 
 
-    /*private void initBluetooth() {
+
+    private void initBluetooth() {
             if(ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
                 bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             }
-    }*/
+    }
     //Sandra 12.08.2019 (onStartCommand)
     @Override
     public int onStartCommand (Intent intent, int flags, int startId){

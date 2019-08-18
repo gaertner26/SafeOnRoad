@@ -10,6 +10,7 @@
             android:icon="@drawable/ic_bluetooth_auto_on"
             android:title="Connect your car with the App via Bluetooth"/>
 
+
         <item android:id="@+id/auto_start"
             android:icon="@drawable/auto_safe_on_road_on"
             android:title="Auto start"/>

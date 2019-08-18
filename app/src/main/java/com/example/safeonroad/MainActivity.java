@@ -12,10 +12,13 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.app.Activity;
 import android.app.NotificationManager;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Icon;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -32,6 +35,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import java.util.Set;
+
 
 public class MainActivity extends AppCompatActivity /*implements LocationListener */{
     //UI to test the service with speedometer
@@ -39,6 +44,8 @@ public class MainActivity extends AppCompatActivity /*implements LocationListene
     private Button permissions;
     private TextView textView;
     private DrawerLayout drawLayout;
+    private Button button3;
+    private TextView bluetoothCar;
 
     private final int PERMISSIONS_LOCATION = 3;
     private final int PERMISSION_NOT_GRANTED = 0;
@@ -52,6 +59,9 @@ public class MainActivity extends AppCompatActivity /*implements LocationListene
     private String provider;
     private Location location;
     private Boolean GPSisEnabled;
+
+    private int carID;
+    private static final int REQUEST_ENABLE = 1;
 
 
     //Times for Cooldowns etc
@@ -149,6 +159,35 @@ public class MainActivity extends AppCompatActivity /*implements LocationListene
                 startService(i);
             }
         });
+        button3 = findViewById(R.id.button3);
+        bluetoothCar = findViewById(R.id.textViewBluetoothCar);
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getCarId();
+            }
+        });
+
+    }
+    private void getCarId() {
+
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if(bluetoothAdapter == null) {
+            Toast toast = Toast.makeText(this, "Your device does not support bluetooth", Toast.LENGTH_LONG);
+            toast.show();
+        }
+        if(!bluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE);
+        }
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        if(pairedDevices.size() > 0) {
+            for (BluetoothDevice device : pairedDevices) {
+                String deviceName = device.getName();
+                String deviceHardwareAddress = device.getAddress();
+                bluetoothCar.setText(deviceName);
+            }
+        }
     }
 
     private void requestPermissions() {

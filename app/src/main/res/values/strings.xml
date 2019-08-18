@@ -6,4 +6,5 @@
     <string name="dialog_ok">OK</string>
     <string name="navigation_drawer_open">Open Navigation Draw</string>
     <string name="navigation_drawer_closed">Close Navigation Draw</string>
+    <string name="bluetooth_car">Your car</string>
 </resources>

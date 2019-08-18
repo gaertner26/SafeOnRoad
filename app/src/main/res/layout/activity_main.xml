@@ -29,34 +29,45 @@
             android:layout_height="match_parent" />-->
 
 
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            app:headerLayout="@layout/navigation_layout"
+            app:menu="@menu/drawer_menu" />
+
         <TextView
             android:id="@+id/textView"
             android:layout_width="match_parent"
-            android:layout_height="419dp" />
+            android:layout_height="wrap_content" />
 
-        <Button
-            android:id="@+id/start"
+        <TextView
+            android:id="@+id/textViewBluetoothCar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/permissions"
-            android:layout_marginTop="-77dp"
-            android:text="START" />
+            android:layout_height="58dp"
+            android:hint="@string/bluetooth_car" />
 
         <Button
             android:id="@+id/permissions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/textView"
-            android:layout_marginTop="452dp"
             android:text="GET PERMISSIONS" />
+
+        <Button
+            android:id="@+id/start"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/textViewBluetoothCar"
+            android:text="START" />
+
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TEST" />
 
     </LinearLayout>
 
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/navigation"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        app:headerLayout="@layout/navigation_layout"
-        app:menu="@menu/drawer_menu" />
 </androidx.drawerlayout.widget.DrawerLayout>
