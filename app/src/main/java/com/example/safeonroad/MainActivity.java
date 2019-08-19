@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     //Switch switchEnableButton;
     private ImageView appOnOff;
+    private NavigationView navi;
     private static TextView textView;
     private DrawerLayout drawLayout;
     private Button button3;
@@ -103,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_closed);
         drawLayout.addDrawerListener(toggle);
         toggle.syncState();
+
     }
 
     @Override
@@ -156,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void initViews() {
        //DO NOT DELETE switchEnableButton = findViewById(R.id.switch_app_enable);
-        NavigationView navi = findViewById(R.id.navigation);
+        navi = findViewById(R.id.navigation);
         navi.setNavigationItemSelectedListener(this);
 
         textView = findViewById(R.id.textView);
@@ -206,6 +208,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(this, "The App is activated", Toast.LENGTH_SHORT).show();
                 break;
         }
+        drawLayout.closeDrawer(GravityCompat.START);
         return true;
     }
 
