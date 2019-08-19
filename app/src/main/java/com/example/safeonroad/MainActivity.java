@@ -5,6 +5,7 @@ package com.example.safeonroad;
 // The part with Intent is also a test, and doesn't work and can be deleted
 
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -27,6 +28,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -38,10 +40,12 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.material.navigation.NavigationView;
+
 import java.util.Set;
 
 
-public class MainActivity extends AppCompatActivity /*implements LocationListener */{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener /*implements LocationListener */{
     //UI to test the service with speedometer
     //private Button appOffOn;
 
@@ -113,6 +117,9 @@ public class MainActivity extends AppCompatActivity /*implements LocationListene
     private void initService() {
         Intent i = new Intent(this, MainService.class);
         startService(i);
+        textView.setText("Service Started!");
+        appOnOff.setImageResource(R.drawable.safeonroadon);
+
         /*
         //if Main Button Was pressed: Start MainBackgroundService in ANOTHER THREAD!
         service.setIdBluethoothCar(int carID);
@@ -148,7 +155,11 @@ public class MainActivity extends AppCompatActivity /*implements LocationListene
 
     private void initViews() {
        //DO NOT DELETE switchEnableButton = findViewById(R.id.switch_app_enable);
+        NavigationView navi = findViewById(R.id.navigation);
+        navi.setNavigationItemSelectedListener(this);
+
         textView = findViewById(R.id.textView);
+
         appOnOff = findViewById(R.id.app_on);
         appOnOff.setImageResource(R.drawable.safeonroadoff);
         appOnOff.setOnClickListener(new View.OnClickListener() {
@@ -156,11 +167,7 @@ public class MainActivity extends AppCompatActivity /*implements LocationListene
             @Override
             public void onClick(View view) {
                 requestPermissions();
-                Intent i = new Intent(MainActivity.this, MainService.class);
-                startService(i);
-                textView.setText("Service Started!");
-                appOnOff.setImageResource(R.drawable.safeonroadon);
-
+                initService();
             }
         });
     /** PLEASE! DO NOT DELETE, may be it will work))
@@ -186,6 +193,20 @@ public class MainActivity extends AppCompatActivity /*implements LocationListene
         });
 
     }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        switch (menuItem.getItemId()){
+            case R.id.bluetooth_on:
+                getCarId();
+                break;
+            case R.id.auto_start:
+                initService();
+                break;
+        }
+        return true;
+    }
+
     private void getCarId() {
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
