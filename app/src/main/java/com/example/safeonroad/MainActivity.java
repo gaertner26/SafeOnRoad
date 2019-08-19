@@ -15,6 +15,7 @@ import android.app.Activity;
 import android.app.NotificationManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -170,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 initService();
             }
         });
-    /** PLEASE! DO NOT DELETE, may be it will work))
+    /** PLEASE! DO NOT DELETE, may be it will work later))
      *  switchEnableButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -202,6 +203,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.auto_start:
                 initService();
+                Toast.makeText(this, "The App is activated", Toast.LENGTH_SHORT).show();
                 break;
         }
         return true;
