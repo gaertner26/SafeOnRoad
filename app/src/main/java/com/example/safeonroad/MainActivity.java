@@ -29,6 +29,9 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
@@ -40,13 +43,16 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity /*implements LocationListener */{
     //UI to test the service with speedometer
-    private Button start;
-    private Button permissions;
+    //private Button appOffOn;
+
+    //Switch switchEnableButton;
+    private ImageView appOnOff;
     private static TextView textView;
     private DrawerLayout drawLayout;
     private Button button3;
     private TextView bluetoothCar;
 
+    private boolean f = false;
     private final int PERMISSIONS_LOCATION = 3;
     private final int PERMISSION_NOT_GRANTED = 0;
     private final int PERMISSION_ALREADY_GRANTED = 1;
@@ -84,9 +90,6 @@ public class MainActivity extends AppCompatActivity /*implements LocationListene
         */
     }
 
-    //By Sandra 2019-08-12 14:55
-
-    //written by Victoria 12.08.2019, 22:34
 
     private void initActionBar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -144,26 +147,35 @@ public class MainActivity extends AppCompatActivity /*implements LocationListene
     }
 
     private void initViews() {
-
-
-        start = findViewById(R.id.start);
+       //DO NOT DELETE switchEnableButton = findViewById(R.id.switch_app_enable);
         textView = findViewById(R.id.textView);
-        permissions = findViewById(R.id.permissions);
-        permissions.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                requestPermissions();
-            }
-        });
-        start.setOnClickListener(new View.OnClickListener() {
+        appOnOff = findViewById(R.id.app_on);
+        appOnOff.setImageResource(R.drawable.safeonroadoff);
+        appOnOff.setOnClickListener(new View.OnClickListener() {
             //hier the App should calculate in background the speed and then, according to the data, set the textView, but it obviously does not work so easy;((
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(MainActivity.this, MainService.class); //Changed to MainService by Sandra 2019-08-12 14:57
+                requestPermissions();
+                Intent i = new Intent(MainActivity.this, MainService.class);
                 startService(i);
                 textView.setText("Service Started!");
+                appOnOff.setImageResource(R.drawable.safeonroadon);
+
             }
         });
+    /** PLEASE! DO NOT DELETE, may be it will work))
+     *  switchEnableButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b){
+                    appOffOn.setEnabled(true);
+                } else{
+                    stopService(i);
+                    appOffOn.setEnabled(false);
+
+                }
+            }
+        });**/
         button3 = findViewById(R.id.button3);
         bluetoothCar = findViewById(R.id.textViewBluetoothCar);
         button3.setOnClickListener(new View.OnClickListener() {
@@ -216,7 +228,9 @@ public class MainActivity extends AppCompatActivity /*implements LocationListene
                     if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) context, permission)) {
                         return PERMISSION_ALREADY_REVOKED;
                     } else {
+                        appOnOff.setImageResource(R.drawable.safeonroadoff);
                         return PERMISSION_NOT_GRANTED;
+
                     }
                 }
             }
