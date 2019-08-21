@@ -31,9 +31,13 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,6 +47,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 
@@ -57,6 +62,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawLayout;
     private Button button3;
     private TextView bluetoothCar;
+    private ListView BtPairedDevices;
+
+
 
     private boolean f = false;
     private final int PERMISSIONS_LOCATION = 3;
@@ -72,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Location location;
     private Boolean GPSisEnabled;
 
-    private int carID;
+    private String carID;
     private static final int REQUEST_ENABLE = 1;
 
 
@@ -119,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void initService() {
         Intent i = new Intent(this, MainService.class);
+        i.putExtra("carID", carID);
         startService(i);
         textView.setText("Service Started!");
         appOnOff.setImageResource(R.drawable.safeonroadon);
@@ -173,6 +182,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 initService();
             }
         });
+
     /** PLEASE! DO NOT DELETE, may be it will work later))
      *  switchEnableButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -188,9 +198,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });**/
         button3 = findViewById(R.id.button3);
         bluetoothCar = findViewById(R.id.textViewBluetoothCar);
+        BtPairedDevices = findViewById(R.id.paired_devices);
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                BtPairedDevices.setVisibility(View.VISIBLE);
                 getCarId();
             }
         });
@@ -224,13 +236,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivityForResult(enableBtIntent, REQUEST_ENABLE);
         }
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        String[] btDevices = new String[pairedDevices.size()];
+        int index = 0;
         if(pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {
-                String deviceName = device.getName();
-                String deviceHardwareAddress = device.getAddress();
-                bluetoothCar.setText(deviceName);
+                btDevices[index] = device.getName() + " " + device.getAddress();
+                index++;
             }
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, btDevices);
+            BtPairedDevices.setAdapter(arrayAdapter);
+            BtPairedDevices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String selectedItem = (String) BtPairedDevices.getAdapter().getItem(position);
+                    bluetoothCar.setText(selectedItem);
+                    BtPairedDevices.setVisibility(View.INVISIBLE);
+                }
+            });
+
         }
+
+        carID = bluetoothCar.getText().toString();
     }
 
     private void requestPermissions() {
