@@ -227,20 +227,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void getCarId() {
 
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        Log.d("BLUETOOTH","in Get Car ID");
         if(bluetoothAdapter == null) {
             Toast toast = Toast.makeText(this, "Your device does not support bluetooth", Toast.LENGTH_LONG);
             toast.show();
+            Log.d("BLUETOOTH","first {]");
         }
         if(!bluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE);
+            Log.d("BLUETOOTH","second []");
         }
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
         String[] btDevices = new String[pairedDevices.size()];
+
+        final ArrayList<String> adresses = new ArrayList<>();
+
         int index = 0;
         if(pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {
                 btDevices[index] = device.getName() + " " + device.getAddress();
+                adresses.add(device.getAddress());
                 index++;
             }
             ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, btDevices);
@@ -248,12 +255,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             BtPairedDevices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    MainActivity.setText(adresses.get(position));
                     String selectedItem = (String) BtPairedDevices.getAdapter().getItem(position);
                     bluetoothCar.setText(selectedItem);
                     BtPairedDevices.setVisibility(View.INVISIBLE);
                 }
             });
 
+        }else{
+            Log.d("BLUETOOTH","No Bluethooth Devices found");
         }
 
         carID = bluetoothCar.getText().toString();
