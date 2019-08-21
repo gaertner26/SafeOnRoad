@@ -246,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int index = 0;
         if(pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {
-                btDevices[index] = device.getName() + " " + device.getAddress();
+                btDevices[index] = device.getName();
                 adresses.add(device.getAddress());
                 index++;
             }

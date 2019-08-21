@@ -75,18 +75,17 @@
             android:text = "Enabled"
             android:checked="true"/>
         -->
-        <ImageView
-            android:id="@+id/app_on"
-            android:layout_width="193dp"
-            android:layout_height="200dp"
-            android:layout_gravity="center" />
-
         <ListView
             android:id="@+id/paired_devices"
             android:layout_width="match_parent"
-            android:layout_height="338dp"
+            android:layout_height="match_parent"
             android:visibility="invisible" />
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="200dp"
+            android:id="@+id/app_on"
+            android:layout_gravity="center"/>
     </LinearLayout>
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation"
@@ -94,8 +93,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/navigation_layout"
-        app:menu="@menu/drawer_menu" >
-
-    </com.google.android.material.navigation.NavigationView>
+        app:menu="@menu/drawer_menu" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
