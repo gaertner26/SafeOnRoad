@@ -256,6 +256,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     MainActivity.setText(adresses.get(position));
+                    carID = adresses.get(position);
                     String selectedItem = (String) BtPairedDevices.getAdapter().getItem(position);
                     bluetoothCar.setText(selectedItem);
                     BtPairedDevices.setVisibility(View.INVISIBLE);
@@ -266,7 +267,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Log.d("BLUETOOTH","No Bluethooth Devices found");
         }
 
-        carID = bluetoothCar.getText().toString();
     }
 
     private void requestPermissions() {

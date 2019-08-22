@@ -7,4 +7,6 @@
     <string name="navigation_drawer_open">Open Navigation Draw</string>
     <string name="navigation_drawer_closed">Close Navigation Draw</string>
     <string name="bluetooth_car">Your car</string>
+    <string name="channel_name">Channel</string>
+    <string name="channel_discription">Channel to send notification, when SafeOnRoad is active</string>
 </resources>
