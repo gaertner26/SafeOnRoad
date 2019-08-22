@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     //Switch switchEnableButton;
     private ImageView appOnOff;
+    private int appOnOffpos = 0;
     private NavigationView navi;
     private static TextView textView;
     private DrawerLayout drawLayout;
@@ -130,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         i.putExtra("carID", carID);
         startService(i);
         textView.setText("Service Started!");
-        appOnOff.setImageResource(R.drawable.safeonroadon);
 
         /*
         //if Main Button Was pressed: Start MainBackgroundService in ANOTHER THREAD!
@@ -178,10 +178,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             //hier the App should calculate in background the speed and then, according to the data, set the textView, but it obviously does not work so easy;((
             @Override
             public void onClick(View view) {
-                requestPermissions();
-                initService();
-            }
-        });
+                    if (appOnOffpos == 0) {
+                        appOnOff.setImageResource(R.drawable.safeonroadon);
+                        initService();
+                        appOnOffpos = 1;
+                    } else if (appOnOffpos == 1) {
+                        appOnOff.setImageResource(R.drawable.safeonroadoff);
+                        appOnOffpos = 0;
+                        Intent i = new Intent(MainActivity.this,MainService.class);
+                       stopService(i);
+                       textView.setText("App is off");
+                    }
+                }
+            });
 
     /** PLEASE! DO NOT DELETE, may be it will work later))
      *  switchEnableButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -313,48 +322,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
         dialog.show();
     }
-
-    /*private void initLocation() {
-        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        provider = LocationManager.GPS_PROVIDER;
-        GPSisEnabled = locationManager.isProviderEnabled(provider);
-        if(GPSisEnabled) {
-            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-            locationManager.requestLocationUpdates(provider, MIN_TIME_BETWEEN_UPDATES, MIN_DISTANCE_CHECK_FOR_UPDATES, this);
-            location = locationManager.getLastKnownLocation(provider);
-
-        }
-    }
-    @Override
-    public void onLocationChanged (Location location){
-        this.location = location;
-        if(location != null) {
-            textView.setText("You moved");
-        }else{
-            textView.setText("Your location isn´t available");
-        }
-        if(location.getSpeed()* 3.6 >= MIN_SPEED){
-            textView.setText("zu schnell");
-        }
-    }
-
-    @Override
-    public void onStatusChanged (String s,int i, Bundle bundle){
-
-    }
-
-    @Override
-    public void onProviderEnabled (String provider){
-
-    }
-
-    @Override
-    public void onProviderDisabled (String provider){
-
-    }
-    */
 
     }
 
