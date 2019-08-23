@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">SafeOnRoad</string>
+    <string name="prev_all_permissions">Already got all permissions</string>
+    <string name="dialog_title">Revoked permission previously</string>
+    <string name="dialog_message">Please grant permission now</string>
+    <string name="dialog_ok">OK</string>
+    <string name="navigation_drawer_open">Open Navigation Draw</string>
+    <string name="navigation_drawer_closed">Close Navigation Draw</string>
+    <string name="bluetooth_car">Your car</string>
+</resources>
