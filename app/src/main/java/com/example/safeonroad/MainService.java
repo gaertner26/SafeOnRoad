@@ -49,7 +49,6 @@ public class MainService extends Service implements LocationListener {
 
     private int idBluethoothCar;
     */
-
     private final int MIN_SPEED = 1;
 
     private static final long MIN_DISTANCE_CHECK_FOR_UPDATES = 0; //10 meters Location will update every 10 meters. Only after the user have moved the location will be updated
@@ -66,7 +65,11 @@ public class MainService extends Service implements LocationListener {
     float autoCooldownStartTime = 0;
     float AUTOCOOLDOWNTIME = 5000; // Time, the user has to be slower than 1 m/s, before the Do Not Disturb Mode deactivates itself (Ampelpausen etc)
 
+    String carID;
+
+
     public MainService() {
+
         /*while (isServiceActive) {
 
 
@@ -107,6 +110,7 @@ public class MainService extends Service implements LocationListener {
     //App did break, when start-Button was clicked, this fixed the problem
     @Override
     public void onCreate(){
+        super.onCreate();
         initLocation();
         initBluetooth();
 
@@ -122,7 +126,7 @@ public class MainService extends Service implements LocationListener {
         }
 
         if (Build.VERSION.SDK_INT >= 23 && notificationManager.isNotificationPolicyAccessGranted()) {
-            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE);      //no Interruption = Everything Blocked
+            notificationManager.setInterruptionFilter(INTERRUPTION_FILTER_NONE);      //no Interruption = Everything Blocked
         }
 
     }
@@ -140,6 +144,13 @@ public class MainService extends Service implements LocationListener {
         }
     }
 
+    public int getDontDisturbMode(){
+        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= 23 && !notificationManager.isNotificationPolicyAccessGranted()) {     //ask for persmission
+            return notificationManager.getCurrentInterruptionFilter();
+        }
+        return 1;
+    }
 
 
 
@@ -151,7 +162,9 @@ public class MainService extends Service implements LocationListener {
     //Sandra 12.08.2019 (onStartCommand)
     @Override
     public int onStartCommand (Intent intent, int flags, int startId){
-        return Service.START_NOT_STICKY;
+        Bundle extras = intent.getExtras();
+        carID = extras.getString(carID);
+        return Service.START_STICKY;
     }
 
     @Override
@@ -182,7 +195,7 @@ public class MainService extends Service implements LocationListener {
         Log.d("SPEED"," Current Speed: " + String.valueOf(location.getSpeed()));
         MainActivity.setText(" Current Speed: " + String.valueOf(location.getSpeed()));
 
-        if(location.getSpeed()*3.6 >= MIN_SPEED){
+        if(location.getSpeed()*3.6 >= MIN_SPEED ){ //&& getDontDisturbMode() != NotificationManager.INTERRUPTION_FILTER_NONE
             doNotDisturbOn();
             autoCooldownStartTime = 0;
             sendNotification();
@@ -258,11 +271,10 @@ public class MainService extends Service implements LocationListener {
     }
 
     @Override
-    public void onDestroy() {
+    public void onDestroy(){
+        super.onDestroy();
         doNotDisturbOff();
-
     }
-
 
 
 
