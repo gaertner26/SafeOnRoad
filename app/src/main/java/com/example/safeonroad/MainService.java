@@ -172,6 +172,7 @@ public class MainService extends Service implements LocationListener {
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
     }
+
     // TODO Hinweis darauf, dass GPS nicht an ist
     private void initLocation() {
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -193,12 +194,13 @@ public class MainService extends Service implements LocationListener {
         //do not disturb modus is activate, if speed is higher than 20 kilometers per hour
         this.location = location;
         Log.d("SPEED"," Current Speed: " + String.valueOf(location.getSpeed()));
-        MainActivity.setText(" Current Speed: " + String.valueOf(location.getSpeed()));
+        MainActivity.setText(" Current Speed: " + String.valueOf(location.getSpeed()*3.6));
 
         if(location.getSpeed()*3.6 >= MIN_SPEED ){ //&& getDontDisturbMode() != NotificationManager.INTERRUPTION_FILTER_NONE
             doNotDisturbOn();
             autoCooldownStartTime = 0;
             sendNotification();
+
         }
 
 
@@ -270,6 +272,10 @@ public class MainService extends Service implements LocationListener {
 
     }
 
+    @Override
+    public boolean onUnbind (Intent intent) {
+        return super.onUnbind(intent);
+    }
     @Override
     public void onDestroy(){
         super.onDestroy();
