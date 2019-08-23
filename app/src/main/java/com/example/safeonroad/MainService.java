@@ -49,6 +49,7 @@ public class MainService extends Service implements LocationListener {
 
     private int idBluethoothCar;
     */
+
     private final int MIN_SPEED = 1;
 
     private static final long MIN_DISTANCE_CHECK_FOR_UPDATES = 0; //10 meters Location will update every 10 meters. Only after the user have moved the location will be updated
@@ -150,7 +151,7 @@ public class MainService extends Service implements LocationListener {
     //Sandra 12.08.2019 (onStartCommand)
     @Override
     public int onStartCommand (Intent intent, int flags, int startId){
-        return Service.START_STICKY;
+        return Service.START_NOT_STICKY;
     }
 
     @Override
@@ -217,7 +218,7 @@ public class MainService extends Service implements LocationListener {
 
     private void sendNotification() {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP );
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
         Intent stopServiceIntent = new Intent(this, MainActivity.class);
@@ -255,6 +256,14 @@ public class MainService extends Service implements LocationListener {
         notificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
 
     }
+
+    @Override
+    public void onDestroy() {
+        doNotDisturbOff();
+
+    }
+
+
 
 
     //Bluetooth Permissions are in the Manifest now by Sandra 2019-08-12 15:01

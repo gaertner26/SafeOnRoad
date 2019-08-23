@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView bluetoothCar;
     private ListView BtPairedDevices;
 
+    private Intent i;
 
 
     private boolean f = false;
@@ -95,8 +96,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         initActionBar();
         if(getIntent().hasExtra(getString(R.string.NOTIFICATION_ID_KEY))) {
             Toast.makeText(this, "Service muss gestoppt werden", Toast.LENGTH_SHORT).show();
-            Intent i = new Intent(MainActivity.this,MainService.class);
-            stopService(i);
+
         }
         // init location + textView by Sandra 2019-08-14 12:56
         /*initLocation();
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void initService() {
-        Intent i = new Intent(this, MainService.class);
+        i = new Intent(this, MainService.class);
         i.putExtra("carID", carID);
         startService(i);
         textView.setText("Service Started!");
@@ -185,14 +185,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onClick(View view) {
                     if (appOnOffpos == 0) {
                         appOnOff.setImageResource(R.drawable.safeonroadon);
+                        requestPermissions();
                         initService();
                         appOnOffpos = 1;
                     } else if (appOnOffpos == 1) {
                         appOnOff.setImageResource(R.drawable.safeonroadoff);
-                        appOnOffpos = 0;
-                        Intent i = new Intent(MainActivity.this,MainService.class);
                        stopService(i);
                        textView.setText("App is off");
+                       appOnOffpos = 0;
                     }
                 }
             });
