@@ -1,6 +1,7 @@
 package com.example.safeonroad;
 
 import android.Manifest;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -20,6 +21,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import java.util.Calendar;
 
@@ -53,6 +56,8 @@ public class MainService extends Service implements LocationListener {
     private String provider;
     private Location location;
     private Boolean GPSisEnabled;
+    private static final String CHANNEL_ID = "my_channel_id";
+    private static final int notification_id = 123;
 
     float autoCooldownStartTime = 0;
     float AUTOCOOLDOWNTIME = 5000; // Time, the user has to be slower than 1 m/s, before the Do Not Disturb Mode deactivates itself (Ampelpausen etc)
@@ -175,6 +180,7 @@ public class MainService extends Service implements LocationListener {
         if(location.getSpeed()*3.6 >= MIN_SPEED){
             doNotDisturbOn();
             autoCooldownStartTime = 0;
+            sendNotification();
         }
 
 
@@ -204,6 +210,35 @@ public class MainService extends Service implements LocationListener {
     public void onProviderDisabled (String provider){
 
     }
+
+    private void sendNotification() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID )
+                .setSmallIcon(R.drawable.auto_safe_on_road_on)
+                .setContentTitle("SafeOnRoad")
+                .setContentText("SafeOnRoad is now active")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true);
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_discription);
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
+        notificationManagerCompat.notify(notification_id, builder.build());
+
+    }
+
 
     //Bluetooth Permissions are in the Manifest now by Sandra 2019-08-12 15:01
     /*private boolean isBluetoothActive(){
