@@ -65,7 +65,11 @@ public class MainService extends Service implements LocationListener {
     float autoCooldownStartTime = 0;
     float AUTOCOOLDOWNTIME = 5000; // Time, the user has to be slower than 1 m/s, before the Do Not Disturb Mode deactivates itself (Ampelpausen etc)
 
+    String carID;
+
+
     public MainService() {
+
         /*while (isServiceActive) {
 
 
@@ -106,6 +110,7 @@ public class MainService extends Service implements LocationListener {
     //App did break, when start-Button was clicked, this fixed the problem
     @Override
     public void onCreate(){
+        super.onCreate();
         initLocation();
         initBluetooth();
 
@@ -150,6 +155,8 @@ public class MainService extends Service implements LocationListener {
     //Sandra 12.08.2019 (onStartCommand)
     @Override
     public int onStartCommand (Intent intent, int flags, int startId){
+        Bundle extras = intent.getExtras();
+        carID = extras.getString(carID);
         return Service.START_STICKY;
     }
 
@@ -255,6 +262,13 @@ public class MainService extends Service implements LocationListener {
         notificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
 
     }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        doNotDisturbOff();
+    }
+
 
 
     //Bluetooth Permissions are in the Manifest now by Sandra 2019-08-12 15:01
