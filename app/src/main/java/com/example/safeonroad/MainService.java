@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -57,7 +58,9 @@ public class MainService extends Service implements LocationListener {
     private Location location;
     private Boolean GPSisEnabled;
     private static final String CHANNEL_ID = "my_channel_id";
-    private static final int notification_id = 123;
+    private static final int NOTIFICATION_ID = 123;
+
+    private static final int NOTIFICATION_COLOR = Color.YELLOW;
 
     float autoCooldownStartTime = 0;
     float AUTOCOOLDOWNTIME = 5000; // Time, the user has to be slower than 1 m/s, before the Do Not Disturb Mode deactivates itself (Ampelpausen etc)
@@ -105,6 +108,7 @@ public class MainService extends Service implements LocationListener {
     public void onCreate(){
         initLocation();
         initBluetooth();
+
 
     }
 
@@ -214,15 +218,28 @@ public class MainService extends Service implements LocationListener {
     private void sendNotification() {
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+
+        Intent stopServiceIntent = new Intent(this, MainActivity.class);
+        stopServiceIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        stopServiceIntent.putExtra(getString(R.string.NOTIFICATION_ID_KEY), NOTIFICATION_ID);
+        PendingIntent stopServicePendingIntent = PendingIntent.getActivity(this, 0, stopServiceIntent,PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID )
                 .setSmallIcon(R.drawable.auto_safe_on_road_on)
                 .setContentTitle("SafeOnRoad")
                 .setContentText("SafeOnRoad is now active")
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setWhen(0)
+                .setStyle(new NotificationCompat.BigTextStyle())
+                .setColorized(true)
+                .setColor(NOTIFICATION_COLOR)
                 .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
+                .setAutoCancel(true)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        NotificationCompat.Action action = new NotificationCompat.Action.Builder(R.drawable.ic_cancel_service,"Turn of SafeOnRoad", stopServicePendingIntent).build();
+        builder.addAction(action);
+
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = getString(R.string.channel_name);
@@ -235,7 +252,7 @@ public class MainService extends Service implements LocationListener {
         }
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
-        notificationManagerCompat.notify(notification_id, builder.build());
+        notificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
 
     }
 

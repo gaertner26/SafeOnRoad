@@ -9,4 +9,5 @@
     <string name="bluetooth_car">Your car</string>
     <string name="channel_name">Channel</string>
     <string name="channel_discription">Channel to send notification, when SafeOnRoad is active</string>
+    <string name="NOTIFICATION_ID_KEY">NOTIFICATION_ID_KEY</string>
 </resources>

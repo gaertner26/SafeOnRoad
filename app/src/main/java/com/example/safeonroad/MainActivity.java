@@ -93,6 +93,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         initViews();
         initActionBar();
+        if(getIntent().hasExtra(getString(R.string.NOTIFICATION_ID_KEY))) {
+            Toast.makeText(this, "Service muss gestoppt werden", Toast.LENGTH_SHORT).show();
+            Intent i = new Intent(MainActivity.this,MainService.class);
+            stopService(i);
+        }
         // init location + textView by Sandra 2019-08-14 12:56
         /*initLocation();
         if(location != null) {
