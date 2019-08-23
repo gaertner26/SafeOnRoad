@@ -278,6 +278,7 @@ public class MainService extends Service implements LocationListener {
     }
     @Override
     public void onDestroy(){
+        locationManager.removeUpdates(this);
         super.onDestroy();
         doNotDisturbOff();
     }
