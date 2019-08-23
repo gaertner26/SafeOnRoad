@@ -126,7 +126,7 @@ public class MainService extends Service implements LocationListener {
         }
 
         if (Build.VERSION.SDK_INT >= 23 && notificationManager.isNotificationPolicyAccessGranted()) {
-            notificationManager.setInterruptionFilter(INTERRUPTION_FILTER_NONE);      //no Interruption = Everything Blocked
+            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE);      //no Interruption = Everything Blocked
         }
 
     }
