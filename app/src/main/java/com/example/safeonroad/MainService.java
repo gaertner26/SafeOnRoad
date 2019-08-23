@@ -126,7 +126,7 @@ public class MainService extends Service implements LocationListener {
         }
 
         if (Build.VERSION.SDK_INT >= 23 && notificationManager.isNotificationPolicyAccessGranted()) {
-            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE);      //no Interruption = Everything Blocked
+            notificationManager.setInterruptionFilter(INTERRUPTION_FILTER_NONE);      //no Interruption = Everything Blocked
         }
 
     }
@@ -144,6 +144,13 @@ public class MainService extends Service implements LocationListener {
         }
     }
 
+    public int getDontDisturbMode(){
+        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= 23 && !notificationManager.isNotificationPolicyAccessGranted()) {     //ask for persmission
+            return notificationManager.getCurrentInterruptionFilter();
+        }
+        return 1;
+    }
 
 
 
@@ -188,7 +195,7 @@ public class MainService extends Service implements LocationListener {
         Log.d("SPEED"," Current Speed: " + String.valueOf(location.getSpeed()));
         MainActivity.setText(" Current Speed: " + String.valueOf(location.getSpeed()));
 
-        if(location.getSpeed()*3.6 >= MIN_SPEED){
+        if(location.getSpeed()*3.6 >= MIN_SPEED ){ //&& getDontDisturbMode() != NotificationManager.INTERRUPTION_FILTER_NONE
             doNotDisturbOn();
             autoCooldownStartTime = 0;
             sendNotification();
