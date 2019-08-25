@@ -49,7 +49,7 @@ public class MainService extends Service implements LocationListener {
 
     private int idBluethoothCar;
     */
-    private final int MIN_SPEED = 2;
+    private final int MIN_SPEED = 1;
 
     private static final long MIN_DISTANCE_CHECK_FOR_UPDATES = 0; //10 meters Location will update every 10 meters. Only after the user have moved the location will be updated
     private static final long MIN_TIME_BETWEEN_UPDATES = 1000;
@@ -62,11 +62,12 @@ public class MainService extends Service implements LocationListener {
 
     private static final int NOTIFICATION_COLOR = Color.YELLOW;
 
-    float autoCooldownStartTime = 0;
-    float AUTOCOOLDOWNTIME = 5000; // Time, the user has to be slower than 1 m/s, before the Do Not Disturb Mode deactivates itself (Ampelpausen etc)
+    long autoCooldownStartTime = -1;
+    int AUTOCOOLDOWNTIME = 5000; // Time, the user has to be slower than 1 m/s, before the Do Not Disturb Mode deactivates itself (Ampelpausen etc)
 
     String carID;
 
+    private boolean isDontDisturbOn = FALSE;
 
     public MainService() {
 
@@ -128,7 +129,7 @@ public class MainService extends Service implements LocationListener {
         if (Build.VERSION.SDK_INT >= 23 && notificationManager.isNotificationPolicyAccessGranted()) {
             notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE);      //no Interruption = Everything Blocked
         }
-
+        isDontDisturbOn = TRUE;
     }
 
     public void doNotDisturbOff () {
@@ -142,23 +143,15 @@ public class MainService extends Service implements LocationListener {
         if (Build.VERSION.SDK_INT >= 23 && notificationManager.isNotificationPolicyAccessGranted()) {
             notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);      //no Interruption = Everything Blocked
         }
+        isDontDisturbOn = FALSE;
     }
-
-    public int getDontDisturbMode(){
-        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT >= 23 && !notificationManager.isNotificationPolicyAccessGranted()) {     //ask for persmission
-            return notificationManager.getCurrentInterruptionFilter();
-        }
-        return 1;
-    }
-
-
 
     private void initBluetooth() {
             if(ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
                 bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             }
     }
+
     //Sandra 12.08.2019 (onStartCommand)
     @Override
     public int onStartCommand (Intent intent, int flags, int startId){
@@ -199,23 +192,26 @@ public class MainService extends Service implements LocationListener {
         Log.d("SPEED"," Current Speed: " + speed);
         MainActivity.setText(" Current Speed: " + speed);
 
-        if(speed >= MIN_SPEED ){ //&& getDontDisturbMode() != NotificationManager.INTERRUPTION_FILTER_NONE
+        //Log.d("MODE", getDontDisturbMode()+"");
+        if(speed >= MIN_SPEED && !isDontDisturbOn){
             doNotDisturbOn();
-            autoCooldownStartTime = 0;
+            autoCooldownStartTime = -1;
             sendNotification();
 
         }
+        Log.d("MODE", autoCooldownStartTime +"");
 
-
-        if(speed < MIN_SPEED){
-            if(autoCooldownStartTime == 0){
+        if(speed < MIN_SPEED && isDontDisturbOn){
+            if(autoCooldownStartTime == -1){
                 autoCooldownStartTime = System.currentTimeMillis();
             }else if(System.currentTimeMillis() - autoCooldownStartTime > AUTOCOOLDOWNTIME){
                 doNotDisturbOff();
-                autoCooldownStartTime = 0;
+                Log.d("MODE", "Dont Disturb Turned off");
+                autoCooldownStartTime = -1;
             }
 
         }
+
 
     }
 
