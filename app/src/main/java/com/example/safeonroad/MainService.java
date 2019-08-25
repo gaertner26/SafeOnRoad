@@ -118,7 +118,7 @@ public class MainService extends Service implements LocationListener {
 
     }
 
-    public void doNotDisturbOn(){
+    private void changeDoNotDisturbMode(boolean value){
         NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         // Check if the notification policy access has been granted for the app.
         if ((Build.VERSION.SDK_INT >= 23 && !notificationManager.isNotificationPolicyAccessGranted())) {     //ask for persmission
@@ -127,24 +127,16 @@ public class MainService extends Service implements LocationListener {
         }
 
         if (Build.VERSION.SDK_INT >= 23 && notificationManager.isNotificationPolicyAccessGranted()) {
-            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE);      //no Interruption = Everything Blocked
+            if(value){
+                notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE);      //dont let any notfication come through
+                isDontDisturbOn = TRUE;
+            }else{
+                notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);      //let every notification through
+                isDontDisturbOn = FALSE;
+            }
         }
-        isDontDisturbOn = TRUE;
     }
 
-    public void doNotDisturbOff () {
-        NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-        // Check if the notification policy access has been granted for the app.
-        if ((Build.VERSION.SDK_INT >= 23 && !notificationManager.isNotificationPolicyAccessGranted())) {     //ask for persmission
-            Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
-            startActivity(intent);
-        }
-
-        if (Build.VERSION.SDK_INT >= 23 && notificationManager.isNotificationPolicyAccessGranted()) {
-            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);      //no Interruption = Everything Blocked
-        }
-        isDontDisturbOn = FALSE;
-    }
 
     private void initBluetooth() {
             if(ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
@@ -193,11 +185,12 @@ public class MainService extends Service implements LocationListener {
         MainActivity.setText(" Current Speed: " + speed);
 
         //Log.d("MODE", getDontDisturbMode()+"");
-        if(speed >= MIN_SPEED && !isDontDisturbOn){
-            doNotDisturbOn();
+        if(speed >= MIN_SPEED){
             autoCooldownStartTime = -1;
-            sendNotification();
-
+            if(isDontDisturbOn == FALSE){
+                changeDoNotDisturbMode(TRUE);
+                sendNotification();
+            }
         }
         Log.d("MODE", autoCooldownStartTime +"");
 
@@ -205,7 +198,7 @@ public class MainService extends Service implements LocationListener {
             if(autoCooldownStartTime == -1){
                 autoCooldownStartTime = System.currentTimeMillis();
             }else if(System.currentTimeMillis() - autoCooldownStartTime > AUTOCOOLDOWNTIME){
-                doNotDisturbOff();
+                changeDoNotDisturbMode(FALSE);
                 Log.d("MODE", "Dont Disturb Turned off");
                 autoCooldownStartTime = -1;
             }
@@ -279,7 +272,7 @@ public class MainService extends Service implements LocationListener {
     public void onDestroy(){
         locationManager.removeUpdates(this);
         super.onDestroy();
-        doNotDisturbOff();
+        changeDoNotDisturbMode(FALSE);
     }
 
 
