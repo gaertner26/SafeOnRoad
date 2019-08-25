@@ -49,7 +49,7 @@ public class MainService extends Service implements LocationListener {
 
     private int idBluethoothCar;
     */
-    private final int MIN_SPEED = 1;
+    private final int MIN_SPEED = 2;
 
     private static final long MIN_DISTANCE_CHECK_FOR_UPDATES = 0; //10 meters Location will update every 10 meters. Only after the user have moved the location will be updated
     private static final long MIN_TIME_BETWEEN_UPDATES = 1000;
@@ -186,17 +186,20 @@ public class MainService extends Service implements LocationListener {
             location = locationManager.getLastKnownLocation(provider);
             Log.d("SPEED","Created Location Updater");
             MainActivity.setText("Created Location Updater");
+        }else{
+            MainActivity.setText("Please Enable GPS!");
+            stopSelf();
         }
     }
 
     @Override
     public void onLocationChanged (Location location){
-        //do not disturb modus is activate, if speed is higher than 20 kilometers per hour
         this.location = location;
-        Log.d("SPEED"," Current Speed: " + String.valueOf(location.getSpeed()));
-        MainActivity.setText(" Current Speed: " + String.valueOf(location.getSpeed()*3.6));
+        double speed = location.getSpeed()*3.6;
+        Log.d("SPEED"," Current Speed: " + speed);
+        MainActivity.setText(" Current Speed: " + speed);
 
-        if(location.getSpeed()*3.6 >= MIN_SPEED ){ //&& getDontDisturbMode() != NotificationManager.INTERRUPTION_FILTER_NONE
+        if(speed >= MIN_SPEED ){ //&& getDontDisturbMode() != NotificationManager.INTERRUPTION_FILTER_NONE
             doNotDisturbOn();
             autoCooldownStartTime = 0;
             sendNotification();
@@ -204,7 +207,7 @@ public class MainService extends Service implements LocationListener {
         }
 
 
-        if(location.getSpeed()*3.6 < MIN_SPEED){
+        if(speed < MIN_SPEED){
             if(autoCooldownStartTime == 0){
                 autoCooldownStartTime = System.currentTimeMillis();
             }else if(System.currentTimeMillis() - autoCooldownStartTime > AUTOCOOLDOWNTIME){
