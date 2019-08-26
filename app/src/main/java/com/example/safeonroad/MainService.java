@@ -16,16 +16,12 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.SystemClock;
-import android.telephony.VisualVoicemailSmsFilterSettings;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-
-import java.util.Calendar;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -38,7 +34,7 @@ public class MainService extends Service implements LocationListener {
     //private Location newLocation;
 
     private BluetoothAdapter bluetoothAdapter;
-    public boolean isServiceActive = TRUE;
+    //public boolean isServiceActive = TRUE;
 
     /*private long manualCoolddownStartTime = 0;   //timestamp when user told the app to go to standby for 1 hr
     private long autoCooldownStartTime = 0; // timestamp when the car started to drive < 20 hm/h
@@ -54,9 +50,9 @@ public class MainService extends Service implements LocationListener {
     private static final long MIN_DISTANCE_CHECK_FOR_UPDATES = 0; //10 meters Location will update every 10 meters. Only after the user have moved the location will be updated
     private static final long MIN_TIME_BETWEEN_UPDATES = 1000;
     private LocationManager locationManager;
-    private String provider;
-    private Location location;
-    private Boolean GPSisEnabled;
+    //private String provider;
+    //private Location location;
+    //private Boolean GPSisEnabled;
     private static final String CHANNEL_ID = "my_channel_id";
     private static final int NOTIFICATION_ID = 123;
 
@@ -69,55 +65,18 @@ public class MainService extends Service implements LocationListener {
 
     private boolean isDontDisturbOn = FALSE;
 
-    public MainService() {
-
-        /*while (isServiceActive) {
-
-
-
-            if (velocity >= 20) {
-                dontDisturb(TRUE);
-            } else if (velocity < 20) {
-                dontDisturb(FALSE);
-            }
-
-            //sleep(250);
-            if(isBluetoothActive() && isBluetoothCarActive()){
-                dontDisturb(TRUE);
-            }else{
-                long time = System.currentTimeMillis();
-                if(System.currentTimeMillis() - manualCoolddownStartTime >= manualCooldownDuration){  //check, if app has been paused for 2 hours
-                    float velocity = location.getSpeed(); //changed by Sandra 2019-08-12 14:55
-                    if(velocity >= 20){ //&& getDontDisturb() == false){
-                        dontDisturb(TRUE);
-                        autoCooldownStartTime = 0;
-                    }else if(velocity < 20){
-                        if(autoCooldownStartTime == 0){   // check, if the car has been at least 2 mins slower than 20 km/h
-                            autoCooldownStartTime = System.currentTimeMillis();
-                        }else if(System.currentTimeMillis() - autoCooldownStartTime > autoCooldownDuration){
-                            dontDisturb(FALSE);
-                        }
-                    }
-
-                }
-            }
-
-
-
-        }*/
-
-    }
-
-    //App did break, when start-Button was clicked, this fixed the problem
     @Override
     public void onCreate(){
         super.onCreate();
         initLocation();
         initBluetooth();
-
-
     }
 
+    /**
+     * called by the onLocationChanged method
+     * Used to change the dont-disturb mode
+     * @param value TRUE = Mode on, FALSE = Mode off
+     */
     private void changeDoNotDisturbMode(boolean value){
         NotificationManager notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         // Check if the notification policy access has been granted for the app.
@@ -144,7 +103,11 @@ public class MainService extends Service implements LocationListener {
             }
     }
 
-    //Sandra 12.08.2019 (onStartCommand)
+    /**
+     * called when the service gets started
+     * used for retrieving the MAC adress of the wanted bluetooth device
+     * @param intent Intent with the Extra
+     */
     @Override
     public int onStartCommand (Intent intent, int flags, int startId){
         Bundle extras = intent.getExtras();
@@ -158,28 +121,35 @@ public class MainService extends Service implements LocationListener {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    // TODO Hinweis darauf, dass GPS nicht an ist
+    /**
+     * Called when the Service gets started
+     * Instantiates the Location Manger if GPS in enabled, otherwise stops the Service again
+     */
     private void initLocation() {
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        provider = LocationManager.GPS_PROVIDER;
-        GPSisEnabled = locationManager.isProviderEnabled(provider);
+        String provider = LocationManager.GPS_PROVIDER;
+        Boolean GPSisEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if(GPSisEnabled) {
             if (ActivityCompat.checkSelfPermission(MainService.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainService.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
             locationManager.requestLocationUpdates(provider, MIN_TIME_BETWEEN_UPDATES, MIN_DISTANCE_CHECK_FOR_UPDATES, this);
-            location = locationManager.getLastKnownLocation(provider);
             Log.d("SPEED","Created Location Updater");
             MainActivity.setText("Created Location Updater");
         }else{
-            MainActivity.setText("Please Enable GPS!");
+            Toast.makeText(this, "Please turn on your GPS!", Toast.LENGTH_SHORT).show();
             stopSelf();
         }
     }
 
+    /**
+     * Usually called every second by the locationManager
+     * Retrieves the speed and decides, weather the state of the do-not-Disturb Mode should be changed or not
+     * @param location current location
+     */
     @Override
     public void onLocationChanged (Location location){
-        this.location = location;
+        //this.location = location;
         double speed = location.getSpeed()*3.6;
         Log.d("SPEED"," Current Speed: " + speed);
         MainActivity.setText(" Current Speed: " + speed);
@@ -223,6 +193,9 @@ public class MainService extends Service implements LocationListener {
 
     }
 
+    /**
+     * When the dont-disturb mode gets activated in the onLocationChanged method, this Notification tells the user, that the SafeOnRoad App has done that
+     */
     private void sendNotification() {
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP );
