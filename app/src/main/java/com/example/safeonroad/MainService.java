@@ -71,7 +71,7 @@ public class MainService extends Service implements LocationListener {
     @Override
     public void onCreate(){
         super.onCreate();
-        initLocation();
+        //initLocation();
         initBluetooth();
     }
 
@@ -102,11 +102,10 @@ public class MainService extends Service implements LocationListener {
     private final BroadcastReceiver reciever = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("BLUE1", "recieved Something!");
             String action = intent.getAction();
             if (action.equals(BluetoothDevice.ACTION_FOUND)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                Log.d("BLUE1", device.getName());
+                Log.d("founddevice", device.getName());
             }
         }
     };
@@ -124,12 +123,6 @@ public class MainService extends Service implements LocationListener {
         IntentFilter scannedDevicesFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(reciever, scannedDevicesFilter);
 
-        /*
-        Intent discoverableIntent =
-                new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-        startActivity(discoverableIntent);
-        */
 
         bluetoothAdapter.startDiscovery();
         Log.d("BLUE1", "Started Discovering Devices");
