@@ -6,8 +6,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -96,11 +99,40 @@ public class MainService extends Service implements LocationListener {
         }
     }
 
+    private final BroadcastReceiver reciever = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("BLUE1", "recieved Something!");
+            String action = intent.getAction();
+            if (action.equals(BluetoothDevice.ACTION_FOUND)) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                Log.d("BLUE1", device.getName());
+            }
+        }
+    };
 
     private void initBluetooth() {
-            if(ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
-                bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            }
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
+            bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            Log.d("BLUE1", "BluetoothAdapter probably null");
+        }
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if(bluetoothAdapter == null){
+            Log.d("BLUE1", "BluetoothAdapter is Null");
+        }
+
+        IntentFilter scannedDevicesFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        registerReceiver(reciever, scannedDevicesFilter);
+
+        /*
+        Intent discoverableIntent =
+                new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+        startActivity(discoverableIntent);
+        */
+
+        bluetoothAdapter.startDiscovery();
+        Log.d("BLUE1", "Started Discovering Devices");
     }
 
     /**
@@ -172,10 +204,7 @@ public class MainService extends Service implements LocationListener {
                 Log.d("MODE", "Dont Disturb Turned off");
                 autoCooldownStartTime = -1;
             }
-
         }
-
-
     }
 
     @Override

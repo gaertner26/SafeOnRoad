@@ -19,6 +19,7 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Icon;
 import android.location.Criteria;
@@ -99,16 +100,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Intent i = new Intent(MainActivity.this, MainService.class);
             stopService(i);
         }
-        // init location + textView by Sandra 2019-08-14 12:56
-        /*initLocation();
-        if(location != null) {
-            textView.setText(Integer.toString((int) location.getLongitude()));
-        }else{
-            textView.setText("Your device has no GPS");
+
+
+        loadCarID();
+    }
+
+    private void loadCarID() {
+        try {
+            SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+            carID = sharedPref.getString("CARNAME", null);
+            bluetoothCar.setText( carID + " " + sharedPref.getString("CARMAC", null));
+        }catch (Exception e){
+
         }
-        //init Service and onDestroy added by Christoph
-        //initService();
-        */
+    }
+
+    private void saveCarID(String carName, String carMAC){
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("CARNAME", carName);  //TODO: CARID in R.string abspeichern
+        editor.putString("CARMAC", carMAC);
+        editor.commit();
     }
 
 
@@ -276,6 +288,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     String selectedItem = (String) BtPairedDevices.getAdapter().getItem(position);
                     bluetoothCar.setText(selectedItem);
                     BtPairedDevices.setVisibility(View.INVISIBLE);
+                    saveCarID(carID, selectedItem);
                 }
             });
 
