@@ -160,7 +160,7 @@ public class MainService extends Service implements LocationListener {
             }
             locationManager.requestLocationUpdates(provider, MIN_TIME_BETWEEN_UPDATES, MIN_DISTANCE_CHECK_FOR_UPDATES, this);
             Log.d("SPEED","Created Location Updater");
-            MainActivity.setText("Created Location Updater");
+           HomeFragment.setText("Created Location Updater");
         }else{
             Toast.makeText(this, "Please turn on your GPS!", Toast.LENGTH_SHORT).show();
             stopSelf();
@@ -177,7 +177,7 @@ public class MainService extends Service implements LocationListener {
         //this.location = location;
         double speed = location.getSpeed()*3.6;
         Log.d("SPEED"," Current Speed: " + speed);
-        MainActivity.setText(" Current Speed: " + speed);
+        HomeFragment.setText(" Current Speed: " + speed);
 
         //Log.d("MODE", getDontDisturbMode()+"");
         if(speed >= MIN_SPEED){

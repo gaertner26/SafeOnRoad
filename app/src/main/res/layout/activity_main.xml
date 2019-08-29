@@ -9,7 +9,6 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -22,70 +21,10 @@
             android:background="@color/colorPrimary"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-        <!-- if we need design for Fragments
         <FrameLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />-->
-
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/textViewBluetoothCar"
-            android:layout_width="match_parent"
-            android:layout_height="58dp"
-            android:hint="@string/bluetooth_car" />
-
-        <!--<Button
-            android:id="@+id/permissions"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/textView"
-            android:text="GET PERMISSIONS" />-->
-
-        <!--<Button
-            android:id="@+id/start"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@id/textViewBluetoothCar"
-            android:text="START" />-->
-
-        <Button
-            android:id="@+id/button3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TEST" />
-
-       <!-- <Button
-            android:id="@+id/app_off_on"
-            android:layout_width="wrap_content"
-            android:layout_height="204dp"
-            android:background = "@drawable/custom_button"
-            android:clickable="true"
-            android:focusable="true"
-            android:layout_gravity="center"/>
-        <Switch
-            android:id="@+id/switch_app_enable"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text = "Enabled"
-            android:checked="true"/>
-        -->
-        <ImageView
-            android:id="@+id/app_on"
-            android:layout_width="193dp"
-            android:layout_height="200dp"
-            android:layout_gravity="center" />
-
-        <ListView
-            android:id="@+id/paired_devices"
-            android:layout_width="match_parent"
-            android:layout_height="338dp"
-            android:visibility="invisible" />
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
     <com.google.android.material.navigation.NavigationView

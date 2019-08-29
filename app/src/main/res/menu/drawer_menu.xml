@@ -1,19 +1,35 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--created by Victoria Serova on 12.08-->
+<?xml version="1.0" encoding="utf-8"?><!--created by Victoria Serova on 12.08-->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
     <!-- This is the menu items, we may adjust and add the items we would like to use in Navigation Menu -->
     <!-- For example, we may add Auto Reply to incoming calls and Auto Reply to incoming SMS.. and whatever we want -->
 
-        <item android:id="@+id/bluetooth_on"
-            android:icon="@drawable/ic_bluetooth_auto_on"
-            android:title="Connect your car with the App via Bluetooth"/>
+    <item
+        android:id="@+id/home"
+        android:icon="@drawable/ic_home"
+        android:title="Main page" />
+
+    <item
+        android:id="@+id/bluetooth_on"
+        android:icon="@drawable/ic_bluetooth_auto_on"
+        android:title="Connect your car with the App via Bluetooth" />
 
 
-        <item android:id="@+id/auto_start"
-            android:icon="@drawable/auto_safe_on_road_on"
-            android:title="Auto start"/>
+    <item
+        android:id="@+id/custom_messenger"
+        android:icon="@drawable/message"
+        android:title="Create custom message" />
+
+    <item
+        android:id="@+id/auto_start"
+        android:icon="@drawable/auto_safe_on_road_on"
+        android:title="Auto start" />
+    <ListView
+        android:id="@+id/paired_devices"
+        android:layout_width="match_parent"
+        android:layout_height="338dp"
+        android:visibility="invisible" />
 
     <!-- With tag "Group" the items stay selected, without they just trigger the action. May be better without tag Group-->
 </menu>
