@@ -162,11 +162,9 @@ public class MainService extends Service implements LocationListener {
     }
 
     private void initBluetooth() {
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) == PackageManager.PERMISSION_GRANTED) {
             bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            Log.d("BLUE1", "BluetoothAdapter probably null");
         }
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if(bluetoothAdapter == null){
             Log.d("BLUE1", "BluetoothAdapter is Null");
         }
