@@ -43,6 +43,7 @@ public class HomeFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        //textView = (TextView) textView.findViewById(R.id.textView) ;
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         getBluetooth = (Button) view.findViewById(R.id.goToBluetoothFragment);
@@ -132,7 +133,7 @@ public class HomeFragment extends Fragment {
         dialog.show();
     }
      static void setText(String text){
-    textView.setText(text);
+    //textView.setText(text);
     }
 }
 
