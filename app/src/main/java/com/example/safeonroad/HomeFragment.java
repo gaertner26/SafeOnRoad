@@ -5,8 +5,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +39,7 @@ public class HomeFragment extends Fragment {
     private final int PERMISSION_NOT_GRANTED = 0;
     private final int PERMISSION_ALREADY_GRANTED = 1;
     private final int PERMISSION_ALREADY_REVOKED = -1;
-    String carId = "";
+    String carID = "";
     private static final int REQUEST_ENABLE = 1;
 
     @Nullable
@@ -77,12 +79,23 @@ public class HomeFragment extends Fragment {
         if (b != null) {
             carId = b.getString("carID");
         }**/
+        loadCarID();
         return view;
+    }
+    private void loadCarID() {
+        try {
+            SharedPreferences sharedPref = this.getActivity().getPreferences(Context.MODE_PRIVATE);
+            carID = sharedPref.getString("CARNAME", null);
+            //bluetoothCar.setText( carID + " " + sharedPref.getString("CARMAC", null));
+        }catch (Exception e){
+
+        }
     }
 
     private void initService() {
         Intent i = new Intent(getActivity(), MainService.class);
-        i.putExtra("carID", carId);
+        i.putExtra("carID", carID);
+        Log.d("BLUE1", carID+"That was CARID in Fragment");
         getActivity().startService(i);
         appOnOff.setImageResource(R.drawable.safeonroadon);
 

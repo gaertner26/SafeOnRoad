@@ -18,6 +18,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -73,10 +74,45 @@ public class MainService extends Service implements LocationListener {
     @Override
     public void onCreate(){
         super.onCreate();
-        runBluetoothService();
-        //initLocation();
-        //initBluetooth();
+
+        //startBluetoothMode();
+
+
     }
+
+    private boolean isGPSAllowed(){
+        return true;
+    }
+    private boolean isGPSModeAvaliable(){
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        //String provider = LocationManager.GPS_PROVIDER;
+        if(locationManager == null){
+            Log.d("BLUE1", "loc null");
+            return false;
+        }else {
+            return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        }
+    }
+
+    private boolean isBluetoothModeAvaliable(){
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if(bluetoothAdapter != null && !carID.equals("ABCD")&& bluetoothAdapter.isEnabled()){
+
+            Log.d("BLUE1", "BLUETOOTH AVALIABLE");
+            return true;
+        }else {
+            Log.d("BLUE1", "BLUETOOTH NOT AVALIABLE");
+            return false;
+        }
+    }
+    private boolean isBluetoothAllowed(){
+        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) == PackageManager.PERMISSION_GRANTED) {
+           return true;
+        }else{
+            return false;
+        }
+    }
+
 
     /**
      * called by the onLocationChanged method
@@ -108,28 +144,57 @@ public class MainService extends Service implements LocationListener {
             String action = intent.getAction();
             if (action.equals(BluetoothDevice.ACTION_FOUND)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                Log.d("founddevice", device.getName());
-                if(carID == device.getAddress()){
-                    changeDoNotDisturbMode(TRUE);
+                Log.d("BLUE1", device.getName());
+                //Log.d("BLUE1", device.getAddress()+ " and this is CARID: " + carID +"---");
+
+                if(carID.equals(device.getAddress())){
+                    Log.d("BLUE1", "Device Adress Matched carID!");
+                    changeDoNotDisturbMode(true);
                     hasfoundCarInTime = true;
                 }
             }
         }
     };
 
-    private void runBluetoothService(){
+    private void startBluetoothMode(){
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                if(isBluetoothModeAvaliable()){
+                    if(hasfoundCarInTime == false){
+                        changeDoNotDisturbMode(false);
+                    }
+
+                    IntentFilter scannedDevicesFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+                    registerReceiver(reciever, scannedDevicesFilter);
+
+                    bluetoothAdapter.cancelDiscovery();
+                    bluetoothAdapter.startDiscovery();
+                    hasfoundCarInTime = false;
+                    Log.d("BLUE1", "Started Discovering Devices");
+                    handler.postDelayed(this, 5000);
+                }else{
+                    if(isGPSAllowed() && isGPSModeAvaliable()){    //if bluetooth isnt on anymore, switch to GPS mode if possible
+                        startGPSMode();
+                    }else{
+                        Log.d("BLUE1", "Stopped Self!");
+                        stopSelf();
+                    }
+                }
+                //bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                /*
                 if(bluetoothAdapter == null || !bluetoothAdapter.isEnabled()){
                     initBluetooth();
                 }
-
+                */
+                /*
                 if(!bluetoothAdapter.isEnabled()){
                     Log.d("BLUE1", "couldnt make bluetooth adapter!");
                     Log.d("BLUE1", carID+"");
                 }
+                */
+                /*
                 Log.d("SPEED", carID+" this was carID");
                 Log.d("SPEED","hello");
 
@@ -149,25 +214,17 @@ public class MainService extends Service implements LocationListener {
                     Log.d("BLUE1", "Started Discovering Devices");
                     handler.postDelayed(this, 5000);
                 }else {
-                    final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
-                    if( manager.isProviderEnabled( LocationManager.GPS_PROVIDER )){
-                        initLocation();
+                    //final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+                    //if( manager.isProviderEnabled( LocationManager.GPS_PROVIDER )){
+                    if(isGPSAllowed() && isGPSModeAvaliable()){
+                        startGPSMode();
                     }else{
                         stopSelf();
-                        Log.d("BLUE1", "StoppedSelf");
                     }
                 }
+                */
             }
-        }, 5000);  //the time is in miliseconds
-    }
-
-    private void initBluetooth() {
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) == PackageManager.PERMISSION_GRANTED) {
-            bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        }
-        if(bluetoothAdapter == null){
-            Log.d("BLUE1", "BluetoothAdapter is Null");
-        }
+        }, 500);  //the time is in miliseconds
     }
 
     /**
@@ -178,10 +235,25 @@ public class MainService extends Service implements LocationListener {
     @Override
     public int onStartCommand (Intent intent, int flags, int startId){
         Bundle extras = intent.getExtras();
-        carID = extras.getString(carID);
+        carID = extras.getString("carID");
         if(carID == null){
             carID = "ABCD";
         }
+        //Log.d("BLUE1", carID+"");
+        if(isBluetoothAllowed() && isBluetoothModeAvaliable()){
+            //Log.d("BLUE1", "gothere1");
+            startBluetoothMode();
+            //Log.d("BLUE1", "gothere2");
+        }
+        /*else if(isGPSAllowed() && isGPSModeAvaliable()){
+            startGPSMode();
+            Log.d("BLUE1", "gothere3");
+        }else{
+            stopSelf();
+            Log.d("BLUE1", "gothere4");
+        }
+        */
+
         return Service.START_STICKY;
     }
 
@@ -202,20 +274,22 @@ public class MainService extends Service implements LocationListener {
             unregisterReceiver(mGpsSwitchStateReceiver);
         }
     }
-    private void initLocation() {
+    private void startGPSMode() {
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         String provider = LocationManager.GPS_PROVIDER;
         Boolean GPSisEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        //Log.d("BLUE1", "in startGPSMODE");
         if(GPSisEnabled) {
+            Log.d("BLUE1", "GPS enabled");
             registerReceiver(mGpsSwitchStateReceiver, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
             if (ActivityCompat.checkSelfPermission(MainService.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainService.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
             locationManager.requestLocationUpdates(provider, MIN_TIME_BETWEEN_UPDATES, MIN_DISTANCE_CHECK_FOR_UPDATES, this);
-            Log.d("SPEED","Created Location Updater");
-            HomeFragment.setText("Created Location Updater");
+            //Log.d("SPEED","Created Location Updater");
+            //HomeFragment.setText("Created Location Updater");
         }else{
-            Toast.makeText(this, "Please turn on your GPS!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Please turn on your GPS!", Toast.LENGTH_SHORT).show();
             //stopSelf();
         }
     }
@@ -229,7 +303,7 @@ public class MainService extends Service implements LocationListener {
     public void onLocationChanged (Location location){
         //this.location = location;
         double speed = location.getSpeed()*3.6;
-        Log.d("SPEED"," Current Speed: " + speed);
+        Log.d("BLUE1"," Current Speed: " + speed);
         HomeFragment.setText(" Current Speed: " + speed);
 
         //Log.d("MODE", getDontDisturbMode()+"");
@@ -252,6 +326,28 @@ public class MainService extends Service implements LocationListener {
             }
         }
     }
+
+    private BroadcastReceiver mGpsSwitchStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (intent.getAction().matches("android.location.PROVIDERS_CHANGED")) {
+                try {
+                    if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {   //if gps gets turned off
+                        stopGPSMode();
+                        if(isBluetoothAllowed() && isBluetoothModeAvaliable()){   //stop service if there is no bluetooth avaliable atm
+                            startBluetoothMode();
+                        }else{
+                            Log.d("BLUE1", "Stopped Self!");
+                            stopSelf();
+                        }
+                    }
+                }catch (Exception e){
+
+                }
+            }
+        }
+    };
 
     @Override
     public void onStatusChanged (String s,int i, Bundle bundle){
@@ -334,18 +430,7 @@ public class MainService extends Service implements LocationListener {
         //changeDoNotDisturbMode(FALSE);
     }
 
-    private BroadcastReceiver mGpsSwitchStateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
 
-            if (intent.getAction().matches("android.location.PROVIDERS_CHANGED")) {
-                if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                    stopGPSMode();
-                    runBluetoothService();
-                }
-            }
-        }
-    };
 
     //Bluetooth Permissions are in the Manifest now by Sandra 2019-08-12 15:01
     /*private boolean isBluetoothActive(){
