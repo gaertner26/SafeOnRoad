@@ -72,6 +72,8 @@ public class MainService extends Service implements LocationListener {
     private boolean isDontDisturbOn = FALSE;
     private boolean hasfoundCarInTime = false;
 
+    private boolean isServiceDestroyed = false;
+
     @Override
     public void onCreate(){
         super.onCreate();
@@ -180,13 +182,14 @@ public class MainService extends Service implements LocationListener {
                     Log.d("BLUE1", "Device Adress Matched carID!");
                     changeDoNotDisturbMode(true);
                     hasfoundCarInTime = true;
+                    sendNotification();
                 }
             }
         }
     };
 
     private void startBluetoothMode(){
-        changeDoNotDisturbMode(false);
+        //changeDoNotDisturbMode(false);
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -194,7 +197,6 @@ public class MainService extends Service implements LocationListener {
                 if(isBluetoothModeAvaliable()){
                     if(hasfoundCarInTime == false){
                         changeDoNotDisturbMode(false);
-                        sendNotification();
                     }
 
                     IntentFilter scannedDevicesFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
@@ -204,7 +206,9 @@ public class MainService extends Service implements LocationListener {
                     bluetoothAdapter.startDiscovery();
                     hasfoundCarInTime = false;
                     Log.d("BLUE1", "Started Discovering Devices");
-                    handler.postDelayed(this, 5000);
+                    if(isServiceDestroyed == false){
+                        handler.postDelayed(this, 5000);
+                    }
                 }else{
                     if(isGPSAllowed() && isGPSModeAvaliable()){    //if bluetooth isnt on anymore, switch to GPS mode if possible
                         startGPSMode();
@@ -300,7 +304,7 @@ public class MainService extends Service implements LocationListener {
         }
     }
     private void startGPSMode() {
-        changeDoNotDisturbMode(false);
+        //changeDoNotDisturbMode(false);
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         String provider = LocationManager.GPS_PROVIDER;
         Boolean GPSisEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -444,6 +448,7 @@ public class MainService extends Service implements LocationListener {
         Log.d("BLUE1", "OnDestroy executed2");
         changeDoNotDisturbMode(false);
         Log.d("BLUE1", "OnDestroy executed3");
+        isServiceDestroyed = true;
         //super.onDestroy();
         //changeDoNotDisturbMode(FALSE);
     }
