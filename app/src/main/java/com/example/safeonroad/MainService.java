@@ -173,7 +173,7 @@ public class MainService extends Service implements LocationListener {
             String action = intent.getAction();
             if (action.equals(BluetoothDevice.ACTION_FOUND)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                Log.d("BLUE1", device.getName());
+                //Log.d("BLUE1", device.getName());
                 //Log.d("BLUE1", device.getAddress()+ " and this is CARID: " + carID +"---");
 
                 if(carID.equals(device.getAddress())){
