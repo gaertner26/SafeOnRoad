@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new MessageFragment()).commit();
                 break;
             case R.id.auto_start:
-                Toast.makeText(this, "The App is activated", Toast.LENGTH_SHORT).show();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new InfoFragment()).commit();
                 break;
         }
         drawLayout.closeDrawer(GravityCompat.START);

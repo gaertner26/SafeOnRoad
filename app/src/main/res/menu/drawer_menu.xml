@@ -24,7 +24,7 @@
     <item
         android:id="@+id/auto_start"
         android:icon="@drawable/auto_safe_on_road_on"
-        android:title="Auto start" />
+        android:title="Information about the App" />
     <ListView
         android:id="@+id/paired_devices"
         android:layout_width="match_parent"
