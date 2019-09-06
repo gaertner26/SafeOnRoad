@@ -24,6 +24,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -78,6 +79,34 @@ public class MainService extends Service implements LocationListener {
         //startBluetoothMode();
 
 
+    }
+    public int onStartCommand (Intent intent, int flags, int startId){
+        Log.d("BLUE1", "On Start Command");
+        try{
+            Bundle extras = intent.getExtras();
+            carID = extras.getString("carID");
+            if(carID == null){
+                carID = "ABCD";
+            }
+            //Log.d("BLUE1", carID+"");
+            if(isBluetoothAllowed() && isBluetoothModeAvaliable()){
+                //Log.d("BLUE1", "gothere1");
+                startBluetoothMode();
+                //Log.d("BLUE1", "gothere2");
+            } else if(isGPSAllowed() && isGPSModeAvaliable()){
+                startGPSMode();
+                Log.d("BLUE1", "gothere3");
+            }else{
+                stopSelf();
+                Log.d("BLUE1", "gothere4");
+            }
+        }catch (Exception e){
+
+        }
+
+
+
+        return Service.START_NOT_STICKY;
     }
 
     private boolean isGPSAllowed(){
@@ -232,36 +261,26 @@ public class MainService extends Service implements LocationListener {
      * used for retrieving the MAC adress of the wanted bluetooth device
      * @param intent Intent with the Extra
      */
-    @Override
-    public int onStartCommand (Intent intent, int flags, int startId){
-        Bundle extras = intent.getExtras();
-        carID = extras.getString("carID");
-        if(carID == null){
-            carID = "ABCD";
-        }
-        //Log.d("BLUE1", carID+"");
-        if(isBluetoothAllowed() && isBluetoothModeAvaliable()){
-            //Log.d("BLUE1", "gothere1");
-            startBluetoothMode();
-            //Log.d("BLUE1", "gothere2");
-        }
-        /*else if(isGPSAllowed() && isGPSModeAvaliable()){
-            startGPSMode();
-            Log.d("BLUE1", "gothere3");
-        }else{
-            stopSelf();
-            Log.d("BLUE1", "gothere4");
-        }
-        */
 
-        return Service.START_STICKY;
-    }
 
+    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        return null;
         // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+
+        //throw new UnsupportedOperationException("Not yet implemented");
     }
+
+
+
+    /*
+    @Override
+    public boolean onUnbind (Intent intent) {
+        return super.onUnbind(intent);
+    }
+    */
+
 
     /**
      * Called when the Service gets started
@@ -270,8 +289,12 @@ public class MainService extends Service implements LocationListener {
 
     private void stopGPSMode(){
         if(locationManager != null){
-            locationManager.removeUpdates(this);
-            unregisterReceiver(mGpsSwitchStateReceiver);
+            try{
+                locationManager.removeUpdates(this);
+                unregisterReceiver(mGpsSwitchStateReceiver);
+            }catch (Exception e){
+
+            }
         }
     }
     private void startGPSMode() {
@@ -330,7 +353,6 @@ public class MainService extends Service implements LocationListener {
     private BroadcastReceiver mGpsSwitchStateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-
             if (intent.getAction().matches("android.location.PROVIDERS_CHANGED")) {
                 try {
                     if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {   //if gps gets turned off
@@ -409,24 +431,17 @@ public class MainService extends Service implements LocationListener {
     }
 
     @Override
-    public boolean onUnbind (Intent intent) {
-        return super.onUnbind(intent);
-    }
-    @Override
     public void onDestroy(){
-        if(locationManager != null){
-            locationManager.removeUpdates(this);
-            try{
-                unregisterReceiver(mGpsSwitchStateReceiver);
-            }catch (Exception e){
-
-            }
-        }
+        Log.d("BLUE1", "OnDestroy");
+        stopGPSMode();
+        Log.d("BLUE1", "OnDestroy executed 1");
         if(bluetoothAdapter != null){
             bluetoothAdapter.cancelDiscovery();
         }
+        Log.d("BLUE1", "OnDestroy executed2");
         changeDoNotDisturbMode(false);
-        super.onDestroy();
+        Log.d("BLUE1", "OnDestroy executed3");
+        //super.onDestroy();
         //changeDoNotDisturbMode(FALSE);
     }
 

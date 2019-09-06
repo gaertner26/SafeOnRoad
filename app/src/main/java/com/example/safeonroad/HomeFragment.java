@@ -2,6 +2,8 @@ package com.example.safeonroad;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,6 +28,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.List;
 import java.util.Objects;
 
 public class HomeFragment extends Fragment {
@@ -81,7 +84,29 @@ public class HomeFragment extends Fragment {
             carId = b.getString("carID");
         }**/
         loadCarID();
+
+        if(isMyServiceRunning(MainService.class)){
+            appOnOff.setImageResource(R.drawable.safeonroadon);
+        }
         return view;
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void onResume(){
+        if(isMyServiceRunning(MainService.class)){
+            appOnOff.setImageResource(R.drawable.safeonroadon);
+        }
+        super.onResume();
     }
 
 
@@ -97,6 +122,9 @@ public class HomeFragment extends Fragment {
 
     private void initService() {
         Intent i = new Intent(getActivity(), MainService.class);
+        if(carID == null){
+            carID = "";
+        }
         i.putExtra("carID", carID);
         Log.d("BLUE1", carID+"That was CARID in Fragment");
         getActivity().startService(i);
