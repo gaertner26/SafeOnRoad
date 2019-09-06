@@ -31,7 +31,8 @@ import java.util.Objects;
 public class HomeFragment extends Fragment {
 
     private ImageView appOnOff;
-    private int appOnOffpos = 0;
+
+    private int appOnOffpos=0;
     private Button getBluetooth;
     private static TextView textView;
 
@@ -57,8 +58,8 @@ public class HomeFragment extends Fragment {
         });
         appOnOff = (ImageView) view.findViewById(R.id.app_on);
         appOnOff.setImageResource(R.drawable.safeonroadoff);
-        appOnOff.setOnClickListener(new View.OnClickListener() {
 
+        appOnOff.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (appOnOffpos == 0) {
@@ -82,6 +83,8 @@ public class HomeFragment extends Fragment {
         loadCarID();
         return view;
     }
+
+
     private void loadCarID() {
         try {
             SharedPreferences sharedPref = this.getActivity().getPreferences(Context.MODE_PRIVATE);
@@ -97,7 +100,6 @@ public class HomeFragment extends Fragment {
         i.putExtra("carID", carID);
         Log.d("BLUE1", carID+"That was CARID in Fragment");
         getActivity().startService(i);
-        appOnOff.setImageResource(R.drawable.safeonroadon);
 
     }
 
