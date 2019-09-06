@@ -186,6 +186,7 @@ public class MainService extends Service implements LocationListener {
     };
 
     private void startBluetoothMode(){
+        changeDoNotDisturbMode(false);
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -193,6 +194,7 @@ public class MainService extends Service implements LocationListener {
                 if(isBluetoothModeAvaliable()){
                     if(hasfoundCarInTime == false){
                         changeDoNotDisturbMode(false);
+                        sendNotification();
                     }
 
                     IntentFilter scannedDevicesFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
@@ -298,6 +300,7 @@ public class MainService extends Service implements LocationListener {
         }
     }
     private void startGPSMode() {
+        changeDoNotDisturbMode(false);
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         String provider = LocationManager.GPS_PROVIDER;
         Boolean GPSisEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
