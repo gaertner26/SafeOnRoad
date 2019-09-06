@@ -74,6 +74,8 @@ public class MainService extends Service implements LocationListener {
 
     private boolean isServiceDestroyed = false;
 
+    private Handler handler;
+
     @Override
     public void onCreate(){
         super.onCreate();
@@ -190,11 +192,11 @@ public class MainService extends Service implements LocationListener {
 
     private void startBluetoothMode(){
         //changeDoNotDisturbMode(false);
-        final Handler handler = new Handler();
+        handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(isBluetoothModeAvaliable()){
+                if(isBluetoothModeAvaliable()){ // && isServiceDestroyed == false
                     if(hasfoundCarInTime == false){
                         changeDoNotDisturbMode(false);
                     }
@@ -206,10 +208,11 @@ public class MainService extends Service implements LocationListener {
                     bluetoothAdapter.startDiscovery();
                     hasfoundCarInTime = false;
                     Log.d("BLUE1", "Started Discovering Devices");
-                    if(isServiceDestroyed == false){
+                    //if(isServiceDestroyed == false){
                         handler.postDelayed(this, 5000);
-                    }
+                    //}
                 }else{
+                    Log.d("BLUE1", "Bluetooth Mode not Avaliable!");
                     if(isGPSAllowed() && isGPSModeAvaliable()){    //if bluetooth isnt on anymore, switch to GPS mode if possible
                         startGPSMode();
                     }else{
@@ -443,13 +446,14 @@ public class MainService extends Service implements LocationListener {
         stopGPSMode();
         Log.d("BLUE1", "OnDestroy executed 1");
         if(bluetoothAdapter != null){
+            handler.removeCallbacksAndMessages(null);
             bluetoothAdapter.cancelDiscovery();
         }
         Log.d("BLUE1", "OnDestroy executed2");
         changeDoNotDisturbMode(false);
         Log.d("BLUE1", "OnDestroy executed3");
         isServiceDestroyed = true;
-        //super.onDestroy();
+        super.onDestroy();
         //changeDoNotDisturbMode(FALSE);
     }
 
