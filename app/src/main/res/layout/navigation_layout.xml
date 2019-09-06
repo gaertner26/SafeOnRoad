@@ -3,7 +3,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/colorPrimary"
+    android:background="#009688"
     android:gravity="bottom"
     android:orientation="vertical"
     android:padding="16dp"
@@ -13,6 +13,8 @@
         android:layout_width="94dp"
         android:layout_height="80dp"
         android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:fadingEdge="horizontal|vertical|none"
         android:src="@drawable/safeonroadimage" />
 
 

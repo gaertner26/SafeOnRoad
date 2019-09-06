@@ -15,6 +15,6 @@
         android:gravity="center"
         android:text="@string/info"
         android:textColor="#ffff"
-        android:textSize="15dp" />
+        android:textSize="15sp" />
 
 </LinearLayout>

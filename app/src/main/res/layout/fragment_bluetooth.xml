@@ -1,39 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="@drawable/unsplash">
 
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/bluetooth_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="9dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="15dp"
+        android:background="#DCFFFFFF"
+        android:fadingEdge="horizontal|vertical"
+        android:gravity="center_horizontal|center_vertical"
         android:text="@string/bluetoth_fragment"
-        android:gravity="top"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:textSize="20dp"/>
+        android:textColor="#3D4242"
+        android:textSize="22sp"
+        android:textStyle="normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/searchBluetooth"
         android:layout_width="wrap_content"
-        android:layout_height="70dp"
-        android:text="SEARCH CAR-ID"
-        android:layout_gravity="center"/>
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        android:background="#009688"
+        android:text="@string/button_search_bluetooth"
+        android:textColor="#FCF7F7"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bluetooth_text" />
+
+    <TextView
+        android:id="@+id/bluetooth_car"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="8dp"
+        android:background="#DBFFFFFF"
+        android:fadingEdge="horizontal|vertical"
+        android:gravity="center_horizontal|center_vertical"
+        android:hint="@string/hint_text_bluetooth_car"
+        android:textColor="#303F9F"
+        android:textColorHint="#7C0A0A0A"
+        android:textSize="22sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/searchBluetooth" />
 
     <ListView
         android:id="@+id/paired_devices"
-        android:layout_width="match_parent"
-        android:layout_height="84dp"
-        android:visibility="invisible" />
-
-
-
-    <TextView
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:id="@+id/bluetooth_car"/>
+        android:layout_height="535dp"
+        android:layout_marginTop="25dp"
+        android:background="#00EE4646"
+        android:scrollbarSize="4dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bluetooth_car" />
 
-</LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
