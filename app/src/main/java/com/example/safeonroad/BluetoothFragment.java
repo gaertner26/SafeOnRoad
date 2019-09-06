@@ -51,6 +51,7 @@ public class BluetoothFragment extends Fragment {
         });
         loadCarID();
         return view;
+
     }
     private void loadCarID() {
         try {
@@ -69,7 +70,6 @@ public class BluetoothFragment extends Fragment {
         editor.commit();
     }
     private void getCarId() {
-
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         Log.d("BLUETOOTH","in Get Car ID");
         if(bluetoothAdapter == null) {
