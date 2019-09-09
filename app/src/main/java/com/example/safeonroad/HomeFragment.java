@@ -109,6 +109,10 @@ public class HomeFragment extends Fragment {
         super.onResume();
     }
 
+    /**
+     * called in onCreateView
+     * gets the MAC adress and name of the bluetooth device selected as the users car in a session before
+     */
 
     private void loadCarID() {
         try {
@@ -119,6 +123,11 @@ public class HomeFragment extends Fragment {
 
         }
     }
+
+    /**
+     * called when clickable ImageView appOnOff is clicked
+     * starts MainService and puts carID as an Extra
+     */
 
     private void initService() {
         Intent i = new Intent(getActivity(), MainService.class);
@@ -131,6 +140,10 @@ public class HomeFragment extends Fragment {
 
     }
 
+    /**
+     * called when clickable ImageView appOnOff is clicked
+     *  checks for internet, location and bluetooth permissions so that MainService can be started
+     */
     private void requestPermissions() {
 
         String[] PERMISSIONS = {Manifest.permission.INTERNET, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN};

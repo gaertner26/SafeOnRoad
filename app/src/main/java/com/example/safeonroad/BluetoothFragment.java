@@ -53,6 +53,12 @@ public class BluetoothFragment extends Fragment {
         return view;
 
     }
+
+    /**
+     * called in onCreateView
+     * gets the MAC adress and name of the bluetooth device selected as the users car in a session before
+     */
+
     private void loadCarID() {
         try {
             SharedPreferences sharedPref = this.getActivity().getPreferences(Context.MODE_PRIVATE);
@@ -69,6 +75,13 @@ public class BluetoothFragment extends Fragment {
         editor.putString("CARMAC", carMAC);
         editor.commit();
     }
+
+    /**
+     * called when button search is clicked
+     * get a list of paired bluetooth devices
+     * user can select one to be saved as his car
+     */
+
     private void getCarId() {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         Log.d("BLUETOOTH","in Get Car ID");

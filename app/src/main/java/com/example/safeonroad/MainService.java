@@ -400,7 +400,7 @@ public class MainService extends Service implements LocationListener {
      * When the dont-disturb mode gets activated in the onLocationChanged method, this Notification tells the user, that the SafeOnRoad App has done that
      */
     private void sendNotification() {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, HomeFragment.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP );
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
