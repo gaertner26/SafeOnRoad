@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private NavigationView navi;
     private DrawerLayout drawLayout;
+    public static int appOnOffpos =0;
 
 
     @Override

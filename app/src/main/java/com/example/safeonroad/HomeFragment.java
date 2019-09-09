@@ -35,7 +35,6 @@ public class HomeFragment extends Fragment {
 
     private ImageView appOnOff;
 
-    private int appOnOffpos=0;
     private Button getBluetooth;
     private static TextView textView;
 
@@ -60,21 +59,24 @@ public class HomeFragment extends Fragment {
             }
         });
         appOnOff = (ImageView) view.findViewById(R.id.app_on);
-        appOnOff.setImageResource(R.drawable.safeonroadoff);
+
+        appOnOff.setImageResource(R.drawable.safeonroadstart);
 
         appOnOff.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (appOnOffpos == 0) {
+                if (MainActivity.appOnOffpos == 0) {
                     appOnOff.setImageResource(R.drawable.safeonroadon);
                     requestPermissions();
                     initService();
-                    appOnOffpos = 1;
-                } else if (appOnOffpos == 1) {
+                    MainActivity.appOnOffpos = 1;
+
+                } else if (MainActivity.appOnOffpos == 1) {
                     appOnOff.setImageResource(R.drawable.safeonroadoff);
                     Intent i = new Intent(getActivity(), MainService.class);
                     getActivity().stopService(i);
-                    appOnOffpos = 0;
+                    MainActivity.appOnOffpos = 0;
+
                 }
             }
         });
