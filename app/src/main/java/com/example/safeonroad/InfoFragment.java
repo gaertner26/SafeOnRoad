@@ -1,5 +1,4 @@
 package com.example.safeonroad;
-//Victoria Serova 22.08.2019
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +8,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+/**
+ * Shows the text which explains the purpose of this app
+ */
 public class InfoFragment extends Fragment {
     @Nullable
     @Override

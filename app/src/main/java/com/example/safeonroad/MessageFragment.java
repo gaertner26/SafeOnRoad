@@ -1,5 +1,4 @@
 package com.example.safeonroad;
-//Victoria Serova 22.08.2019
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;

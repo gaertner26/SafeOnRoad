@@ -3,92 +3,74 @@ package com.example.safeonroad;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.navigation.NavigationView;
-
-import java.util.List;
-import java.util.Objects;
-
+/**
+ * Shows the Button where you can start/stop the App
+ */
 public class HomeFragment extends Fragment {
+    private ImageView appOnOffImage;
+    private Button getBluetoothButton;
+    private String carID = "";
 
-    private ImageView appOnOff;
-
-    private Button getBluetooth;
-    private static TextView textView;
 
     private final int PERMISSIONS_LOCATION = 3;
     private final int PERMISSION_NOT_GRANTED = 0;
     private final int PERMISSION_ALREADY_GRANTED = 1;
     private final int PERMISSION_ALREADY_REVOKED = -1;
-    String carID = "";
-    private static final int REQUEST_ENABLE = 1;
 
+    /**
+     * creates listener fpr the View Elements
+     * loads in the previously saved CarID
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //textView = (TextView) textView.findViewById(R.id.textView) ;
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-
-        getBluetooth = (Button) view.findViewById(R.id.goToBluetoothFragment);
-        getBluetooth.setOnClickListener(new View.OnClickListener() {
+        getBluetoothButton = view.findViewById(R.id.goToBluetoothFragment);
+        getBluetoothButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new BluetoothFragment()).addToBackStack(null).commit();
             }
         });
-        appOnOff = (ImageView) view.findViewById(R.id.app_on);
-
-        appOnOff.setImageResource(R.drawable.safeonroadstart);
-
-        appOnOff.setOnClickListener(new View.OnClickListener() {
+        appOnOffImage = view.findViewById(R.id.app_on);
+        appOnOffImage.setImageResource(R.drawable.safeonroadstart);
+        appOnOffImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (MainActivity.appOnOffpos == 0) {
-                    appOnOff.setImageResource(R.drawable.safeonroadon);
+                if (MainActivity.isAppOn == false) {
+                    appOnOffImage.setImageResource(R.drawable.safeonroadon);
                     requestPermissions();
                     initService();
-                    MainActivity.appOnOffpos = 1;
-
-                } else if (MainActivity.appOnOffpos == 1) {
-                    appOnOff.setImageResource(R.drawable.safeonroadoff);
+                    MainActivity.isAppOn = true;
+                }else if(MainActivity.isAppOn) {
+                    appOnOffImage.setImageResource(R.drawable.safeonroadoff);
                     Intent i = new Intent(getActivity(), MainService.class);
                     getActivity().stopService(i);
-                    MainActivity.appOnOffpos = 0;
-
+                    MainActivity.isAppOn = false;
                 }
             }
         });
-
-        /**Bundle b = getArguments();
-        if (b != null) {
-            carId = b.getString("carID");
-        }**/
         loadCarID();
-
         if(isMyServiceRunning(MainService.class)){
-            appOnOff.setImageResource(R.drawable.safeonroadon);
+            appOnOffImage.setImageResource(R.drawable.safeonroadon);
         }
         return view;
     }
@@ -97,30 +79,21 @@ public class HomeFragment extends Fragment {
         ActivityManager manager = (ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
+                MainActivity.isAppOn = true;
                 return true;
             }
         }
         return false;
     }
 
-    @Override
-    public void onResume(){
-        if(isMyServiceRunning(MainService.class)){
-            appOnOff.setImageResource(R.drawable.safeonroadon);
-        }
-        super.onResume();
-    }
-
     /**
      * called in onCreateView
-     * gets the MAC adress and name of the bluetooth device selected as the users car in a session before
+     * retrieves the stored MAC Adress of the linked Blueooth Device
      */
-
     private void loadCarID() {
         try {
             SharedPreferences sharedPref = this.getActivity().getPreferences(Context.MODE_PRIVATE);
             carID = sharedPref.getString("CARNAME", null);
-            //bluetoothCar.setText( carID + " " + sharedPref.getString("CARMAC", null));
         }catch (Exception e){
 
         }
@@ -130,16 +103,13 @@ public class HomeFragment extends Fragment {
      * called when clickable ImageView appOnOff is clicked
      * starts MainService and puts carID as an Extra
      */
-
     private void initService() {
         Intent i = new Intent(getActivity(), MainService.class);
         if(carID == null){
             carID = "";
         }
         i.putExtra("carID", carID);
-        Log.d("BLUE1", carID+"That was CARID in Fragment");
         getActivity().startService(i);
-
     }
 
     /**
@@ -147,7 +117,6 @@ public class HomeFragment extends Fragment {
      *  checks for internet, location and bluetooth permissions so that MainService can be started
      */
     private void requestPermissions() {
-
         String[] PERMISSIONS = {Manifest.permission.INTERNET, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN};
         int permission = hasPermissions(getActivity(), PERMISSIONS);
         if (permission == PERMISSION_NOT_GRANTED) {
@@ -162,12 +131,12 @@ public class HomeFragment extends Fragment {
     private int hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
             for (String permission : permissions) {
-//                    This line checks if the permission already has been revoked one time
+                //This line checks if the permission already has been revoked one time
                 if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
                     if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) context, permission)) {
                         return PERMISSION_ALREADY_REVOKED;
                     } else {
-                        appOnOff.setImageResource(R.drawable.safeonroadoff);
+                        appOnOffImage.setImageResource(R.drawable.safeonroadoff);
                         return PERMISSION_NOT_GRANTED;
 
                     }
@@ -177,6 +146,9 @@ public class HomeFragment extends Fragment {
         return PERMISSION_ALREADY_GRANTED;
     }
 
+    /**
+     * Shows dialog in which the user has to accept the permissions
+     */
     private void showDialog(final String[] PERMISSIONS, final int permissionCode) {
         android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(
                 getActivity());
@@ -190,9 +162,7 @@ public class HomeFragment extends Fragment {
         });
         dialog.show();
     }
-     static void setText(String text){
-    //textView.setText(text);
-    }
+
 }
 
 
