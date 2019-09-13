@@ -17,4 +17,5 @@
     <string name="button_search_bluetooth">SEARCH CAR-ID</string>
     <string name="button_to_bluetooth_fragment">GET MY CAR</string>
     <string name="hint_text_bluetooth_car">Your car</string>
+    <string name ="message_fragment">Here there will come the function of creating of a custom message, that will be sent automatically, when the user will be driving a car. The User may write his own custom message. This function is optional and can be afterwards implemented.</string>
 </resources>
