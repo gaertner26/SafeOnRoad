@@ -17,11 +17,6 @@
 
 
     <item
-        android:id="@+id/custom_messenger"
-        android:icon="@drawable/message"
-        android:title="Create custom message" />
-
-    <item
         android:id="@+id/auto_start"
         android:icon="@drawable/auto_safe_on_road_on"
         android:title="Information about the App" />

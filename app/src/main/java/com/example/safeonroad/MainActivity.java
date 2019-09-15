@@ -67,9 +67,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.bluetooth_on:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new BluetoothFragment()).commit();
                 break;
-            case R.id.custom_messenger:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new MessageFragment()).commit();
-                break;
             case R.id.auto_start:
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,new InfoFragment()).commit();
                 break;
